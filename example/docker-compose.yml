@@ -13,7 +13,6 @@ services:
             - ./center/configs:/subsystem/configs
             - ./center/scripts:/subsystem/scripts
             - ./center/logs:/subsystem/logs
-            - ./center/radiality:/subsystem/radiality
         cpuset: "0"
     console:
         build: ./console
@@ -29,7 +28,6 @@ services:
             - ./console/configs:/subsystem/configs
             - ./console/scripts:/subsystem/scripts
             - ./console/logs:/subsystem/logs
-            - ./console/radiality:/subsystem/radiality
         cpuset: "0"
     storage:
         build: ./storage
@@ -45,5 +43,4 @@ services:
             - ./storage/configs:/subsystem/configs
             - ./storage/scripts:/subsystem/scripts
             - ./storage/logs:/subsystem/logs
-            - ./storage/radiality:/subsystem/radiality
         cpuset: "0"
