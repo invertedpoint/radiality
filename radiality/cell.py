@@ -11,8 +11,6 @@ import json
 import requests
 from requests.exceptions import RequestException
 
-from radiality import utils
-
 
 class Effector:
     """
@@ -22,12 +20,16 @@ class Effector:
     sid = None  # TODO: Need to compute with `_subsystem_id`
     # Eventer
     eventer = None
+    # Settings
+    _url_protocol = None
 
     def __init__(self, eventer, intf):
         """
         Initialization
         """
         self.eventer = eventer
+        self._url_protocol = intf.url_protocol
+
         intf.add_route(
             '/spi/v1/cell/{sid}'.format(sid=self.sid), resource=self
         )
@@ -47,7 +49,7 @@ class Effector:
             try:
                 resp = requests.get(
                     url='{protocol}://{freq}/spi/v1/ray'.format(
-                        protocol=utils.URL_PROTOCOL, freq=freq
+                        protocol=self._url_protocol, freq=freq
                     ),
                     params={
                         'sid': self.eventer.sid,

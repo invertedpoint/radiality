@@ -23,13 +23,18 @@ class Eventer:
     # Events and effectors
     _events = {}
     _effectors = []
+    # Settings
+    _url_protocol = None
     # Logging
-    _logger = utils.Logger().applog()
+    _logger = None
 
     def __init__(self, intf):
         """
         Initialization
         """
+        self._url_protocol = intf.url_protocol
+        self._logger = utils.Logger(configs_dir=intf.configs_dir).applog()
+
         intf.add_route('/spi/v1/ray', resource=self)
 
     def log(self, msg, *args, **kwargs):
@@ -81,7 +86,7 @@ class Eventer:
         for (sid, freq) in self._effectors:
             resp = requests.get(
                 url='{protocol}://{freq}/spi/v1/cell/{sid}'.format(
-                    protocol=utils.URL_PROTOCOL, freq=freq, sid=self.sid
+                    protocol=self._url_protocol, freq=freq, sid=self.sid
                 ),
                 params=payload
             )

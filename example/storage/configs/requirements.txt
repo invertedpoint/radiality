@@ -1,6 +1,2 @@
-falcon==0.3.0
-requests==2.9.1
-gunicorn==19.4.5
-eventlet==0.18.4
-PyYAML==3.11
+git+https://github.com/signaldetect/radiality.git#egg=radiality==0.1.0
 git+https://github.com/Supervisor/supervisor.git#egg=supervisor==4.0.0.dev0

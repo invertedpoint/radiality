@@ -12,22 +12,17 @@ import logging.config
 import yaml
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CONFIGS_DIR = os.path.join(BASE_DIR, 'configs')
-URL_PROTOCOL = 'http'
-
-
 class Logger:
     """
     Logging
     """
     _applog = None  # logger instance
 
-    def __init__(self):
+    def __init__(self, configs_dir):
         """
         Setups the logging configuration
         """
-        path = os.path.join(CONFIGS_DIR, 'logging.yaml')
+        path = os.path.join(configs_dir, 'logging.yaml')
 
         if os.path.exists(path):
             with open(path, 'rt') as config_file:

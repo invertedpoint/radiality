@@ -12,6 +12,9 @@ class Subsystem(falcon.API):
     """
     Subsystem programming interface
     """
+    configs_dir = None
+    url_protocol = None
+
     eventer = None
     components = None
 
