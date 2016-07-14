@@ -1,8 +1,12 @@
+import os
 import io
+import imp
 from setuptools import find_packages, setup
 
-from radiality.version import __version__
 
+VERSION = imp.load_source(
+    'version', os.path.join('.', 'radiality', 'version.py')
+).__version__
 
 README = io.open('README.md', 'r', encoding='utf-8').read()
 
@@ -16,7 +20,7 @@ REQUIRES = [
 
 setup(
     name='radiality',
-    version=__version__,
+    version=VERSION,
     description='Framework for microservices with reactive architecture.',
     long_description=README,
     classifiers=[
