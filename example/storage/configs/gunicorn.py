@@ -32,6 +32,7 @@ loglevel = 'debug'
 
 def pre_request(worker, req):
     """
+    Before a worker processes the request
     """
     req.rid = str(uuid4())
     req.query += '&rid={}'.format(req.rid)
@@ -39,5 +40,6 @@ def pre_request(worker, req):
 
 def post_request(worker, req, environ, resp):
     """
+    After a worker processes the request
     """
     worker.wsgi.pulse(req.rid)
