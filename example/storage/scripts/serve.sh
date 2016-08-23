@@ -1,5 +1,3 @@
 #!/bin/bash
 
-exec /subsystem/pypy/bin/gunicorn \
-    -c /subsystem/configs/gunicorn.py \
-    core.subsystem:impl
+exec /subsystem/pypy/bin/pypy3 /subsystem/core/subsystem.py

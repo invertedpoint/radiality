@@ -2,25 +2,34 @@
 center:core.subsystem
 """
 
-import os
+import asyncio
+import websockets
 
-from radiality import Subsystem
-
-from core import eventer
-
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CONFIGS_DIR = os.path.join(BASE_DIR, 'configs')
+from core.eventer import Center
+from core.effectors import Subsystem
 
 
-class Center(Subsystem):
-    """
-    Center subsystem
-    """
-    configs_dir = CONFIGS_DIR
-    url_protocol = 'http'
-
-    eventer = eventer.Center
+eventer = Center()
 
 
-impl = Center()
+@asyncio.coroutine
+def receiver(channel, path):
+    print(path)
+    effector = Subsystem(eventer, channel)
+
+    receiving = True
+    while receiving:
+        receiving = yield from effector.activate()
+
+
+if __name__ == '__main__':
+    event_loop = asyncio.get_event_loop()
+
+    try:
+        serving = websockets.serve(receiver, eventer.host, eventer.port)
+        event_loop.run_until_complete(serving)
+        print('[i] Serving on {0}'.format(eventer.freq))
+
+        event_loop.run_forever()
+    finally:
+        event_loop.close()

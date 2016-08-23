@@ -38,3 +38,23 @@ class Logger:
         Returns the current logger for the application
         """
         return self._applog
+
+
+def subsystem_freq(host, port):
+    return 'ws://{host}:{port}'.format(host=host, port=str(port))
+
+
+def fail_connection():
+    print('[!] Connection closed')
+
+
+def fail_event(event):
+    print('[!] Unknown event: {0}'.format(event))
+
+
+def fail_in_signal():
+    print('[!] Invalid in-signal: could not decode the signal body')
+
+
+def fail_out_signal():
+    print('[!] Invalid out-signal: could not decode the signal body')

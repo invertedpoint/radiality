@@ -2,8 +2,7 @@
 storage:core.effectors
 """
 
-import json
-
+import asyncio
 from radiality import Effector
 
 
@@ -11,54 +10,53 @@ class Center(Effector):
     """
     Effector for the handling of events of the `center` subsystem
     """
-    sid = 'center'
 
-    def __init__(self, *args, **kwargs):
+    def __new__(cls, *args, **kwargs):
         """
-        Initialization
+        Pre-initialization
         """
-        super().__init__(*args, **kwargs)
+        cls.effects = {
+            'systemized': cls.systemized
+        }
 
-        self.connect(freq='center:8888')
+        return super().__new__(cls, *args, **kwargs)
 
-    def on_get(self, req, resp):
-        """
-        Handles of the `GET` requests:
-            * `/spi/v1/cell/center/:subsystem_ready`
-        """
-        if req.get_param('subsystem_ready'):
-            self.subsystem_ready(subsystems=req.params)
+    # default effect
+    @asyncio.coroutine
+    def connected(self, signal):
+        sid = signal.get('sid', None)
+        if sid:
+            self.eventer.wanted.remove(sid)
+            yield from self.eventer.disconnect(sid)
 
-        resp.body = json.dumps({'data': None, 'error': False, 'msg': ''})
+    # effect
+    @asyncio.coroutine
+    def systemized(self, signal):
+        subsystems = signal.get('subsystems', [])
 
-    def subsystem_ready(self, subsystems):
-        """
-        Effect
-        """
-        if 'console' in subsystems:
-            self.connect(freq=subsystems['console'])
+        for (sid, freq, wanted) in subsystems:
+            if self.eventer.sid in wanted:
+                yield from self.eventer.connect(sid, freq)
+                yield from self.eventer.connected(sid)
 
 
 class Console(Effector):
     """
     Effector for the handling of events of the `console` subsystem
     """
-    sid = 'console'
 
-    def on_get(self, req, resp):
+    def __new__(cls, *args, **kwargs):
         """
-        Handles of the `GET` requests:
-            * `/spi/v1/cell/console/:data_sampling`
+        Pre-initialization
         """
-        if req.get_param('data_sampling'):
-            self.data_sampling(rid=req.get_param('rid'))
+        cls.effects = {
+            'ping': cls.ping
+        }
 
-        resp.body = json.dumps({'data': None, 'error': False, 'msg': ''})
+        return super().__new__(cls, *args, **kwargs)
 
-    def data_sampling(self, rid):
-        """
-        Effect
-        """
-        self.log('storage:core.cells.Console.data_sampling')
-
-        self.eventer.data_sampled(rid)
+    # effect
+    @asyncio.coroutine
+    def ping(self, signal):
+        print('Console -> ping')
+        yield from self.eventer.pong()

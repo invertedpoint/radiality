@@ -2,8 +2,7 @@
 console:core.effectors
 """
 
-import json
-
+import asyncio
 from radiality import Effector
 
 
@@ -11,52 +10,56 @@ class Center(Effector):
     """
     Effector for the handling of events of the `center` subsystem
     """
-    sid = 'center'
 
-    def __init__(self, *args, **kwargs):
+    def __new__(cls, *args, **kwargs):
         """
-        Initialization
+        Pre-initialization
         """
-        super().__init__(*args, **kwargs)
+        cls.effects = {
+            'systemized': cls.systemized
+        }
 
-        self.connect(freq='center:8888')
+        return super().__new__(cls, *args, **kwargs)
 
-    def on_get(self, req, resp):
-        """
-        Handles of the `GET` requests:
-            * `/spi/v1/cell/center/:subsystem_ready`
-        """
-        if req.get_param('subsystem_ready'):
-            self.subsystem_ready(subsystems=req.params)
+    # default effect
+    @asyncio.coroutine
+    def connected(self, signal):
+        sid = signal.get('sid', None)
+        if sid:
+            self.eventer.wanted.remove(sid)
+            yield from self.eventer.disconnect(sid)
 
-        resp.body = json.dumps({'data': None, 'error': False, 'msg': ''})
+    # effect
+    @asyncio.coroutine
+    def systemized(self, signal):
+        subsystems = signal.get('subsystems', [])
 
-    def subsystem_ready(self, subsystems):
-        """
-        Effect
-        """
-        if 'storage' in subsystems:
-            self.connect(freq=subsystems['storage'])
+        for (sid, freq, wanted) in subsystems:
+            if self.eventer.sid in wanted:
+                yield from self.eventer.connect(sid, freq)
+                yield from self.eventer.connected(sid)
+
+                print('please stand by...')
+                yield from asyncio.sleep(1)
+                yield from self.eventer.ping()
 
 
 class Storage(Effector):
     """
     Effector for the handling of events of the `storage` subsystem
     """
-    sid = 'storage'
 
-    def on_get(self, req, resp):
+    def __new__(cls, *args, **kwargs):
         """
-        Handles of the `GET` requests:
-            * `/spi/v1/cell/storage/:data_sampled`
+        Pre-initialization
         """
-        if req.get_param('data_sampled'):
-            self.data_sampled(rid=req.get_param('rid'))
+        cls.effects = {
+            'pong': cls.pong
+        }
 
-        resp.body = json.dumps({'data': None, 'error': False, 'msg': ''})
+        return super().__new__(cls, *args, **kwargs)
 
-    def data_sampled(self, rid):
-        """
-        Effect
-        """
-        self.log('console:core.cells.Storage.data_sampled')
+    # effect
+    @asyncio.coroutine
+    def pong(self, signal):
+        print('Storage -> pong')

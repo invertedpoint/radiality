@@ -1,5 +1,5 @@
-Radiality is a Python high-level framework based on
-[Falcon](https://falconframework.org/) and
+Radiality is a Python micro-framework based on
+[asyncio](https://docs.python.org/3/library/asyncio.html) and
 [Observer pattern](http://en.wikipedia.org/wiki/Observer_pattern).
 
 Radiality is designed to program business logic of web-applications with
@@ -19,7 +19,6 @@ Run the sample application via:
 ```
 $ cd example/
 $ sudo docker-compose up -d
-$ curl http://127.0.0.1:50900/api/v1/sample
 ```
 
 ## License
