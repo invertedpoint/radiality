@@ -8,9 +8,9 @@ import websockets
 from radiality import Effector
 from radiality import utils
 
-from core.eventer import Console
-from core.effectors import Center
-from core.effectors import Storage
+from eventer import Console
+from effectors import Center
+from effectors import Storage
 
 
 CENTER_SID = 'center'

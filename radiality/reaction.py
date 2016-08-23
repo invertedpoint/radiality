@@ -10,7 +10,7 @@ import json
 import asyncio
 from websockets.exceptions import ConnectionClosed
 
-import utils
+from radiality import utils
 
 
 class Effector:

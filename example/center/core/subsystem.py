@@ -5,8 +5,8 @@ center:core.subsystem
 import asyncio
 import websockets
 
-from core.eventer import Center
-from core.effectors import Subsystem
+from eventer import Center
+from effectors import Subsystem
 
 
 eventer = Center()

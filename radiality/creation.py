@@ -11,7 +11,7 @@ import asyncio
 import websockets
 from websockets.exceptions import ConnectionClosed
 
-import utils
+from radiality import utils
 
 
 class Eventer:
