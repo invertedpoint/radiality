@@ -58,5 +58,5 @@ class Console(Effector):
     # effect
     @asyncio.coroutine
     def ping(self, signal):
-        print('Console -> ping')
+        self.eventer.logger.info('Console -> ping')
         yield from self.eventer.pong()

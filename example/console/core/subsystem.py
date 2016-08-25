@@ -14,8 +14,8 @@ from effectors import Storage
 
 
 CENTER_SID = 'center'
-CENTER_HOST = 'center'
-CENTER_PORT = 8888
+CENTER_HOST = '127.0.0.1'
+CENTER_PORT = 50500
 CENTER_FREQ = utils.subsystem_freq(CENTER_HOST, CENTER_PORT)
 
 

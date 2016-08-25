@@ -39,7 +39,7 @@ class Center(Effector):
                 yield from self.eventer.connect(sid, freq)
                 yield from self.eventer.connected(sid)
 
-                print('please stand by...')
+                self.eventer.logger.info('please stand by...')
                 yield from asyncio.sleep(1)
                 yield from self.eventer.ping()
 
@@ -62,4 +62,4 @@ class Storage(Effector):
     # effect
     @asyncio.coroutine
     def pong(self, signal):
-        print('Storage -> pong')
+        self.eventer.logger.info('Storage -> pong')
