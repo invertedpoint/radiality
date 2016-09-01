@@ -13,13 +13,20 @@ from websockets.exceptions import ConnectionClosed
 from radiality import utils
 
 
-class Effector:
+class Effector(utils.Loggable):
+    """
+    Receiver of the specific events
+    """
     eventer = None
     effects = {}
     _channel = None
 
     def __init__(self, eventer, channel):
+        """
+        Initialization
+        """
         self.eventer = eventer
+        self._logger = self.eventer._logger
         self._channel = channel
 
     @asyncio.coroutine
@@ -28,9 +35,9 @@ class Effector:
             signal = yield from self._channel.recv()
             signal = json.loads(signal)
         except ConnectionClosed:
-            utils.fail_connection()
+            self.warn('Connection closed')
         except ValueError:
-            utils.fail_in_signal()
+            self.fail('Invalid in-signal -- could not decode the signal body')
         else:
             yield from self.parse(signal)
             return True
@@ -46,9 +53,9 @@ class Effector:
         elif event in self.effects:
             yield from self.effects[event](self, signal)
         elif event is None:
-            utils.fail_in_signal()
+            self.fail('Invalid in-signal -- could not decode the signal body')
         else:
-            utils.fail_event(event)
+            self.warn('Unknown event -- {0}'.format(event))
 
     # effect
     @asyncio.coroutine
@@ -67,10 +74,10 @@ class Effector:
             if self.eventer.sid in wanted:
                 yield from self.eventer.connect(sid, freq)
 
-                channel = self.eventer.effectors.get(sid, None)
+                channel = self.eventer._effectors.get(sid, None)
                 if channel:
                     self._channel = channel
                     yield from self.eventer.connected(sid)
-            elif sid in self.eventer.effectors:
+            elif sid in self.eventer._effectors:
                 yield from self.eventer.disconnect(sid)
-                self.eventer.effectors[sid] = self._channel
+                self.eventer._effectors[sid] = self._channel

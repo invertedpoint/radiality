@@ -14,12 +14,23 @@ from websockets.exceptions import ConnectionClosed
 from radiality import utils
 
 
-class Eventer:
-    effectors = {}
+class Eventer(utils.Loggable):
+    """
+    Emitter of the specific events
+    """
+    configs_dir = None
 
     sid = None
     freq = None
     wanted = []
+
+    _effectors = {}
+
+    def __init__(self):
+        """
+        Initialization
+        """
+        self._logger = utils.Logger(configs_dir=self.configs_dir).applog()
 
     @asyncio.coroutine
     def connect(self, sid, freq):
@@ -27,20 +38,20 @@ class Eventer:
             try:
                 channel = yield from websockets.connect(freq + '/' + self.sid)
             except ConnectionClosed:
-                utils.fail_connection()
+                self.warn('Connection closed')
                 yield from asyncio.sleep(1)
             else:
-                self.effectors[sid] = channel
+                self._effectors[sid] = channel
                 break
 
     @asyncio.coroutine
     def disconnect(self, sid):
-        channel = self.effectors.pop(sid)
+        channel = self._effectors.pop(sid)
 
         try:
             yield from channel.close()
         except ConnectionClosed:
-            utils.fail_connection()
+            self.warn('Connection closed')
         finally:
             del channel
 
@@ -53,19 +64,23 @@ class Eventer:
         try:
             signal = json.dumps(signal)
         except ValueError:
-            utils.fail_out_signal()
+            self.fail('Invalid out-signal -- could not decode the signal body')
         else:
             if sid:
                 try:
-                    yield from self.effectors[sid].send(signal)
+                    yield from self._effectors[sid].send(signal)
                 except ConnectionClosed:
-                    utils.fail_connection()
+                    self.warn('Connection closed')
+                    # Clears the wasted effector
+                    self._effectors.pop(sid)
             else:
-                for (sid, channel) in self.effectors.items():
+                for (sid, channel) in list(self._effectors.items()):
                     try:
                         yield from channel.send(signal)
                     except ConnectionClosed:
-                        utils.fail_connection()
+                        self.warn('Connection closed')
+                        # Clears the wasted effector
+                        self._effectors.pop(sid)
 
     # event
     @asyncio.coroutine

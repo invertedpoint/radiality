@@ -29,7 +29,7 @@ class Logger:
                 config = yaml.safe_load(config_file.read())
             logging.config.dictConfig(config)
         else:
-            logging.basicConfig(level=logging.INFO)
+            logging.basicConfig(level=logging.DEBUG)
 
         self._applog = logging.getLogger('core.app')
 
@@ -40,21 +40,30 @@ class Logger:
         return self._applog
 
 
+class Loggable:
+    """
+    Mixin for the capability of being recorded in a log
+    """
+    _logger = None
+
+    def log(self, msg, *args, **kwargs):
+        """
+        Logs the info message
+        """
+        self._logger.info(msg, *args, **kwargs)
+
+    def warn(self, msg, *args, **kwargs):
+        """
+        Logs the warning message
+        """
+        self._logger.warning(msg, *args, **kwargs)
+
+    def fail(self, msg, *args, **kwargs):
+        """
+        Logs the error message
+        """
+        self._logger.error(msg, *args, **kwargs)
+
+
 def subsystem_freq(host, port):
     return 'ws://{host}:{port}'.format(host=host, port=str(port))
-
-
-def fail_connection():
-    print('[!] Connection closed')
-
-
-def fail_event(event):
-    print('[!] Unknown event: {0}'.format(event))
-
-
-def fail_in_signal():
-    print('[!] Invalid in-signal: could not decode the signal body')
-
-
-def fail_out_signal():
-    print('[!] Invalid out-signal: could not decode the signal body')
