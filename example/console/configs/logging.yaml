@@ -13,7 +13,7 @@ loggers:
 handlers:
     applog:
         class: logging.handlers.RotatingFileHandler
-        filename: /subsystem/logs/app.log
+        filename: ./logs/console_app.log
         formatter: simple
         level: NOTSET
         maxBytes: 1048576  # 1MB
@@ -21,7 +21,7 @@ handlers:
         encoding: utf8
     liblog:
         class: logging.handlers.RotatingFileHandler
-        filename: /subsystem/logs/lib.log
+        filename: ./logs/console_lib.log
         formatter: simple
         level: NOTSET
         maxBytes: 1048576  # 1MB

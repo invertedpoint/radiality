@@ -2,36 +2,36 @@
 storage:core.eventer
 """
 
-import json
+import os
 
+import asyncio
 from radiality import Eventer
+from radiality import utils
+
+
+SELF_SID = 'storage'
+SELF_HOST = '127.0.0.1'
+SELF_PORT = 50100
+SELF_FREQ = utils.subsystem_freq(SELF_HOST, SELF_PORT)
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIGS_DIR = os.path.join(BASE_DIR, 'configs')
 
 
 class Storage(Eventer):
     """
     The `storage` eventer
     """
-    sid = 'storage'
-    freq = 'storage:8888'
+    sid = SELF_SID
+    host = SELF_HOST
+    port = SELF_PORT
+    freq = SELF_FREQ
 
-    def on_get(self, req, resp):
-        """
-        Handles of the `GET` requests:
-            * `/spi/v1/ray/:sid:freq`
-        """
-        sid = req.get_param('sid')
-        freq = req.get_param('freq')
+    wanted = ['center', 'console']
 
-        if sid and freq:
-            # Connecting
-            self.connect(sid, freq)
+    logger = utils.Logger(configs_dir=CONFIGS_DIR).applog()
 
-        resp.body = json.dumps({'data': None, 'error': False, 'msg': ''})
-
-    def data_sampled(self, rid):
-        """
-        Event
-        """
-        self.log('storage:core.rays.Storage.data_sampled')
-
-        self.create_event(event='data_sampled', data=None, rid=rid)
+    # event
+    @asyncio.coroutine
+    def pong(self):
+        yield from self.actualize(event='pong')

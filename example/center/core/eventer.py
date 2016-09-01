@@ -2,39 +2,39 @@
 center:core.eventer
 """
 
-import json
+import os
 
+import asyncio
 from radiality import Eventer
+from radiality import utils
+
+
+SELF_SID = 'center'
+SELF_HOST = '127.0.0.1'
+SELF_PORT = 50500
+SELF_FREQ = utils.subsystem_freq(SELF_HOST, SELF_PORT)
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIGS_DIR = os.path.join(BASE_DIR, 'configs')
 
 
 class Center(Eventer):
     """
     The `center` eventer
     """
-    sid = 'center'
-    freq = 'center:8888'
+    sid = SELF_SID
+    host = SELF_HOST
+    port = SELF_PORT
+    freq = SELF_FREQ
 
-    def on_get(self, req, resp):
-        """
-        Handles of the `GET` requests:
-            * `/spi/v1/ray/:sid:freq`
-        """
-        sid = req.get_param('sid')
-        freq = req.get_param('freq')
+    subsystems = []
 
-        if sid and freq:
-            # Connecting
-            self.connect(sid, freq)
-            self.subsystem_ready(rid=req.get_param('rid'))
+    logger = utils.Logger(configs_dir=CONFIGS_DIR).applog()
 
-        resp.body = json.dumps({'data': None, 'error': False, 'msg': ''})
-
-    def subsystem_ready(self, rid):
-        """
-        Event
-        """
-        self.create_event(
-            event='subsystem_ready',
-            data={sid: freq for (sid, freq) in self._effectors},
-            rid=rid
+    # event
+    @asyncio.coroutine
+    def systemized(self):
+        yield from self.actualize(
+            event='systemized',
+            data={'subsystems': self.subsystems}
         )

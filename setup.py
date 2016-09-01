@@ -11,10 +11,8 @@ VERSION = imp.load_source(
 README = io.open('README.md', 'r', encoding='utf-8').read()
 
 REQUIRES = [
-    'falcon==0.3.0',
-    'requests==2.9.1',
-    'gunicorn==19.4.5',
-    'eventlet==0.18.4',
+    'asyncio==3.4.3',
+    'websockets==3.1',
     'PyYAML==3.11'
 ]
 
