@@ -25,4 +25,7 @@ class Console(radiality.Subsystem):
     def launched(self):
         yield from super().launched()
 
-        yield from self.connect(sid='center', freq='ws://127.0.0.1:50500')
+        channel = yield from self.connect(
+            sid='center', freq='ws://127.0.0.1:50500'
+        )
+        yield from self.disconnect(sid='center', channel=channel)

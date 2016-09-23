@@ -38,7 +38,7 @@ class Subsystem(watch.Loggable, circuit.Connectable):
         self._connector = circuit.Connector(
             logger=self._logger,
             config_path=connection_config,
-            wanted=self.effectors.keys()
+            wanted=list(self.effectors.keys())
         )
 
         if self.eventer:
