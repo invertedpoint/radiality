@@ -1,3 +1,3 @@
 #!/bin/bash
 
-exec $(pwd)/pypy/bin/pypy3 $(pwd)/center/core/subsystem.py
+exec $(pwd)/pypy/bin/pypy3 $(pwd)/center/app.py

@@ -8,55 +8,67 @@ Apache 2.0 licensed.
 import json
 
 import asyncio
-import websockets
 from websockets.exceptions import ConnectionClosed
 
-from radiality import utils
+from radiality import watch
+from radiality import circuit
 
 
-class Eventer(utils.Loggable):
+class Eventer(watch.Loggable, circuit.Connectable):
     """
     Emitter of the specific events
     """
-    configs_dir = None
-
-    sid = None
-    freq = None
-    wanted = []
-
     _effectors = {}
 
-    def __init__(self):
+    def __init__(self, logger, connector):
         """
         Initialization
         """
-        self._logger = utils.Logger(configs_dir=self.configs_dir).applog()
+        self._logger = logger
+        self._connector = connector
 
+    # overridden from `circuit.Connectable`
     @asyncio.coroutine
     def connect(self, sid, freq):
-        while True:
-            try:
-                channel = yield from websockets.connect(freq + '/' + self.sid)
-            except ConnectionClosed:
-                self.warn('Connection closed')
-                yield from asyncio.sleep(1)
-            else:
-                self._effectors[sid] = channel
-                break
+        if sid in self._effectors:  # => reconnect
+            yield from self.disconnect(sid, channel=None)
+
+        channel = yield from super().connect(sid, freq)
+        if channel:  # => register a new effector
+            self.register_effector(sid, channel)
+            yield from self.effector_connected(sid, freq)
+
+        return channel
+
+    # overridden from `circuit.Connectable`
+    @asyncio.coroutine
+    def disconnect(self, sid, channel):
+        channel = self._effectors.pop(sid, channel)
+        yield from super().disconnect(sid, channel)
+
+    def register_effector(self, sid, channel):
+        self._effectors[sid] = channel
 
     @asyncio.coroutine
-    def disconnect(self, sid):
-        channel = self._effectors.pop(sid)
+    def effector_connected(self, sid, freq):
+        signal = {
+            'event': ('biconnected' if sid in self.wanted else 'connected'),
+            'sid': self.sid,
+            'freq': self.freq
+        }
 
         try:
-            yield from channel.close()
-        except ConnectionClosed:
-            self.warn('Connection closed')
-        finally:
-            del channel
+            signal = json.dumps(signal)
+        except ValueError:
+            self.fail('Invalid out-signal -- could not decode the signal body')
+        else:
+            try:
+                yield from self._effectors[sid].send(signal)
+            except ConnectionClosed:
+                self.fail('Connection closed')
 
     @asyncio.coroutine
-    def actualize(self, event, data=None, sid=None):
+    def actualize(self, event, data=None):
         signal = {'event': event}
         if data:
             signal.update(data)
@@ -66,27 +78,10 @@ class Eventer(utils.Loggable):
         except ValueError:
             self.fail('Invalid out-signal -- could not decode the signal body')
         else:
-            if sid:
+            for (sid, channel) in list(self._effectors.items()):
                 try:
-                    yield from self._effectors[sid].send(signal)
+                    yield from channel.send(signal)
                 except ConnectionClosed:
                     self.warn('Connection closed')
                     # Clears the wasted effector
                     self._effectors.pop(sid)
-            else:
-                for (sid, channel) in list(self._effectors.items()):
-                    try:
-                        yield from channel.send(signal)
-                    except ConnectionClosed:
-                        self.warn('Connection closed')
-                        # Clears the wasted effector
-                        self._effectors.pop(sid)
-
-    # event
-    @asyncio.coroutine
-    def connected(self, sid):
-        yield from self.actualize(
-            event='connected',
-            data={'sid': self.sid, 'freq': self.freq, 'wanted': self.wanted},
-            sid=sid
-        )
