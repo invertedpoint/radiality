@@ -10,17 +10,36 @@ import json
 import asyncio
 from websockets.exceptions import ConnectionClosed
 
-from radiality import utils
+from radiality import watch
+from radiality import circuit
 
 
-class Effector:
-    eventer = None
-    effects = {}
+class Effector(watch.Loggable, circuit.Connectable):
+    """
+    Receiver of the specific events
+    """
+    _eventer = None  # type: Eventer
+    _effects = {}  # type: dict of str -> method
     _channel = None
 
-    def __init__(self, eventer, channel):
-        self.eventer = eventer
+    def __init__(self, logger, connector, eventer, channel):
+        """
+        Initialization
+        """
+        self._logger = logger
+        self._connector = connector
+
+        self._eventer = eventer
         self._channel = channel
+
+    # overridden from `circuit.Connectable`
+    @asyncio.coroutine
+    def connect(self, sid, freq):
+        channel = yield from super().connect(sid, freq)
+        if channel:
+            yield from self._connecting(channel)
+
+        return channel
 
     @asyncio.coroutine
     def activate(self):
@@ -28,49 +47,36 @@ class Effector:
             signal = yield from self._channel.recv()
             signal = json.loads(signal)
         except ConnectionClosed:
-            utils.fail_connection()
+            self.warn('Connection closed')
         except ValueError:
-            utils.fail_in_signal()
+            self.fail('Invalid in-signal -- could not decode the signal body')
         else:
-            yield from self.parse(signal)
+            yield from self._parse(signal)
             return True
 
         return False
 
     @asyncio.coroutine
-    def parse(self, signal):
+    def _connecting(self, channel):
+        signal = {'event': 'connecting', 'sid': self.sid, 'freq': self.freq}
+
+        try:
+            signal = json.dumps(signal)
+        except ValueError:
+            self.fail('Invalid out-signal -- could not decode the signal body')
+        else:
+            try:
+                yield from channel.send(signal)
+            except ConnectionClosed:
+                self.fail('Connection closed')
+
+    @asyncio.coroutine
+    def _parse(self, signal):
         event = signal.get('event', None)
 
-        if event == 'connected':
-            yield from self.connected(signal)
-        elif event in self.effects:
-            yield from self.effects[event](self, signal)
+        if event in self._effects:
+            yield from self._effects[event](self, signal)
         elif event is None:
-            utils.fail_in_signal()
+            self.fail('Invalid in-signal -- could not decode the signal body')
         else:
-            utils.fail_event(event)
-
-    # effect
-    @asyncio.coroutine
-    def connected(self, signal):
-        """
-        Subsystem connected
-        """
-        sid = signal.get('sid', None)
-        freq = signal.get('freq', None)
-        wanted = signal.get('wanted', [])
-
-        if sid and freq:
-            if sid in self.eventer.wanted:
-                self.eventer.wanted.remove(sid)
-
-            if self.eventer.sid in wanted:
-                yield from self.eventer.connect(sid, freq)
-
-                channel = self.eventer.effectors.get(sid, None)
-                if channel:
-                    self._channel = channel
-                    yield from self.eventer.connected(sid)
-            elif sid in self.eventer.effectors:
-                yield from self.eventer.disconnect(sid)
-                self.eventer.effectors[sid] = self._channel
+            self.warn('Unknown event -- {0}'.format(event))
