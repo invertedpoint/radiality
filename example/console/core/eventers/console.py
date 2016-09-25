@@ -11,14 +11,6 @@ class Eventer(radiality.Eventer):
     The `console` eventer
     """
 
-    # overridden from `radiality.Eventer`
-    @asyncio.coroutine
-    def effector_connected(self, sid, freq):
-        yield from super().effector_connected(sid, freq)
-
-        if sid == 'storage':
-            yield from self.ping()
-
     # event
     @asyncio.coroutine
     def ping(self):

@@ -29,3 +29,6 @@ class Effector(radiality.Effector):
         for (sid, freq) in subsystems:
             if sid in self.wanted:
                 yield from self.connect(sid, freq)
+
+                if sid == 'storage':
+                    yield from self._eventer.ping()
