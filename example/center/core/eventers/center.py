@@ -22,9 +22,6 @@ class Eventer(radiality.Eventer):
 
             yield from self.systemized(subsystems=self._subsystems)
 
-    # event
-    @asyncio.coroutine
+    @radiality.event
     def systemized(self, subsystems):
-        yield from self.actualize(
-            event='systemized', data={'subsystems': subsystems}
-        )
+        pass

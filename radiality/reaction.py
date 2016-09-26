@@ -14,13 +14,33 @@ from radiality import watch
 from radiality import circuit
 
 
+def effect(method):
+    """
+    Decorator for the definition of an effect
+    """
+    method._is_effect = True
+
+    return asyncio.coroutine(method)
+
+
 class Effector(watch.Loggable, circuit.Connectable):
     """
     Receiver of the specific events
     """
     _eventer = None  # type: Eventer
+    _channel = None  # type: WebSocketServerProtocol
+
     _effects = {}  # type: dict of str -> method
-    _channel = None
+
+    def __new__(cls, *args, **kwargs):
+        """
+        Pre-initialization
+        """
+        for (name, method) in cls.__dict__.items():
+            if getattr(method, '_is_effect', False):
+                cls._effects[name] = method
+
+        return super().__new__(cls, *args, **kwargs)
 
     def __init__(self, logger, connector, eventer, channel):
         """
@@ -31,6 +51,10 @@ class Effector(watch.Loggable, circuit.Connectable):
 
         self._eventer = eventer
         self._channel = channel
+
+    @property
+    def eventer(self):
+        return self._eventer
 
     # overridden from `circuit.Connectable`
     @asyncio.coroutine

@@ -5,6 +5,7 @@ The `radiality/creation.py` is a part of `radiality`.
 Apache 2.0 licensed.
 """
 
+from functools import wraps
 import json
 
 import asyncio
@@ -12,6 +13,24 @@ from websockets.exceptions import ConnectionClosed
 
 from radiality import watch
 from radiality import circuit
+
+
+def event(method):
+    """
+    Decorator for the definition of an event
+    """
+    method = asyncio.coroutine(method)
+
+    @wraps(method)
+    def _wrapper(self, **kwargs):
+        yield from method(self, **kwargs)
+        yield from self._actualize(
+            event=method.__name__, data=(kwargs or None)
+        )
+
+    _wrapper._is_event = True
+
+    return asyncio.coroutine(_wrapper)
 
 
 class Eventer(watch.Loggable, circuit.Connectable):
@@ -68,7 +87,7 @@ class Eventer(watch.Loggable, circuit.Connectable):
                 self.fail('Connection closed')
 
     @asyncio.coroutine
-    def actualize(self, event, data=None):
+    def _actualize(self, event, data=None):
         signal = {'event': event}
         if data:
             signal.update(data)

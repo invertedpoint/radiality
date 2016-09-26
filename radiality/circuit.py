@@ -79,8 +79,8 @@ class Connector(watch.Loggable):
         while True:
             try:
                 channel = yield from websockets.connect(freq)
-            except ConnectionClosed:
-                self.warn('Connection failed. Waiting...')
+            except Exception as exc:
+                self.warn('Connection failed: %s. Waiting...', str(exc))
                 yield from asyncio.sleep(self.WAIT_TIME)
             else:
                 break
