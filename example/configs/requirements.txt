@@ -1,2 +1,2 @@
-git+https://github.com/signaldetect/radiality.git@v0.3#egg=radiality==0.3.0
+git+https://github.com/signaldetect/radiality.git@v0.4#egg=radiality==0.4.0
 git+https://github.com/Supervisor/supervisor.git#egg=supervisor==4.0.0.dev0
