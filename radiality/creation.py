@@ -63,7 +63,9 @@ class Eventer(watch.Loggable, circuit.Connectable):
     @asyncio.coroutine
     def disconnect(self, sid, channel):
         channel = self._effectors.pop(sid, channel)
+
         yield from super().disconnect(sid, channel)
+        yield from self.effector_disconnected(sid)
 
     def register_effector(self, sid, channel):
         self._effectors[sid] = channel
@@ -85,6 +87,10 @@ class Eventer(watch.Loggable, circuit.Connectable):
                 yield from self._effectors[sid].send(signal)
             except ConnectionClosed:
                 self.fail('Connection closed')
+
+    @asyncio.coroutine
+    def effector_disconnected(self, sid):
+        pass
 
     @asyncio.coroutine
     def _actualize(self, event, data=None):

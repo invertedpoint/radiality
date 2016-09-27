@@ -12,6 +12,7 @@ class Effector(radiality.Effector):
 
     @radiality.effect
     def systemized(self, signal):
+        self.log('subsystems')
         subsystems = signal.get('subsystems', [])
 
         for (sid, freq) in subsystems:
