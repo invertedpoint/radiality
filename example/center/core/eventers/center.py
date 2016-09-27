@@ -33,4 +33,4 @@ class Eventer(radiality.Eventer):
 
     @radiality.event
     def systemized(self, subsystems):
-        self.log('systemized: %s', str(subsystems))
+        pass

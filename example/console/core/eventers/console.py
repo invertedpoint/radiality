@@ -2,6 +2,7 @@
 console:core.eventers.console
 """
 
+import asyncio
 import radiality
 
 
