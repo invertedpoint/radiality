@@ -68,39 +68,37 @@ class Effector(watch.Loggable, circuit.Connectable):
     @asyncio.coroutine
     def activate(self):
         try:
-            signal = yield from self._channel.recv()
-            signal = json.loads(signal)
+            data = yield from self._channel.recv()
+            data = json.loads(data)
         except ConnectionClosed:
             self.warn('Connection closed')
         except ValueError:
-            self.fail('Invalid in-signal -- could not decode the signal body')
+            self.fail('Invalid input -- could not decode data: %s', str(data))
         else:
-            yield from self._parse(signal)
+            yield from self._parse(data)
             return True
 
         return False
 
     @asyncio.coroutine
     def _connecting(self, channel):
-        signal = {'event': 'connecting', 'sid': self.sid, 'freq': self.freq}
+        data = {'*signal': 'connecting', 'sid': self.sid, 'freq': self.freq}
 
         try:
-            signal = json.dumps(signal)
+            data = json.dumps(data)
+            yield from channel.send(data)
         except ValueError:
-            self.fail('Invalid out-signal -- could not decode the signal body')
-        else:
-            try:
-                yield from channel.send(signal)
-            except ConnectionClosed:
-                self.fail('Connection closed')
+            self.fail('Invalid output -- could not decode data: %s', str(data))
+        except ConnectionClosed:
+            self.fail('Connection closed')
 
     @asyncio.coroutine
-    def _parse(self, signal):
-        event = signal.get('event', None)
+    def _parse(self, data):
+        event = data.get('*event', None)
 
         if event in self._effects:
-            yield from self._effects[event](self, signal)
+            yield from self._effects[event](self, data)
         elif event is None:
-            self.fail('Invalid in-signal -- could not decode the signal body')
+            self.fail('Invalid input -- could not decode data: %s', str(data))
         else:
             self.warn('Unknown event -- {0}'.format(event))

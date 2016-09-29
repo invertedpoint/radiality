@@ -25,7 +25,7 @@ def event(method):
     def _wrapper(self, **kwargs):
         yield from method(self, **kwargs)
         yield from self._actualize(
-            event=method.__name__, data=(kwargs or None)
+            event=method.__name__, details=(kwargs or None)
         )
 
     _wrapper._is_event = True
@@ -72,41 +72,57 @@ class Eventer(watch.Loggable, circuit.Connectable):
 
     @asyncio.coroutine
     def effector_connected(self, sid, freq):
-        signal = {
-            'event': ('biconnected' if sid in self.wanted else 'connected'),
+        data = {
+            '*signal': ('biconnected' if sid in self.wanted else 'connected'),
             'sid': self.sid,
             'freq': self.freq
         }
 
         try:
-            signal = json.dumps(signal)
+            data = json.dumps(data)
+            yield from self._effectors[sid].send(data)
         except ValueError:
-            self.fail('Invalid out-signal -- could not decode the signal body')
-        else:
-            try:
-                yield from self._effectors[sid].send(signal)
-            except ConnectionClosed:
-                self.fail('Connection closed')
+            self.fail('Invalid output -- could not decode data: %s', str(data))
+        except ConnectionClosed:
+            self.fail('Connection closed')
 
     @asyncio.coroutine
     def effector_disconnected(self, sid):
         pass
 
     @asyncio.coroutine
-    def _actualize(self, event, data=None):
-        signal = {'event': event}
-        if data:
-            signal.update(data)
+    def _transmit(self, signal, channel, details=None):
+        data = {'*signal': signal}
+        if details:
+            data.update(details)
 
         try:
-            signal = json.dumps(signal)
+            data = json.dumps(data)
+            yield from channel.send(data)
         except ValueError:
-            self.fail('Invalid out-signal -- could not decode the signal body')
+            self.fail('Invalid output -- could not decode data: %s', str(data))
+        except ConnectionClosed:
+            self.fail('Connection closed')
+        else:
+            return True
+
+        return False
+
+    @asyncio.coroutine
+    def _actualize(self, event, details=None):
+        data = {'*event': event}
+        if details:
+            data.update(details)
+
+        try:
+            data = json.dumps(data)
+        except ValueError:
+            self.fail('Invalid output -- could not decode data: %s', str(data))
         else:
             for (sid, channel) in list(self._effectors.items()):
                 try:
-                    yield from channel.send(signal)
+                    yield from channel.send(data)
                 except ConnectionClosed:
-                    self.warn('Connection closed')
+                    self.warn('Connection to `%s` closed', sid)
                     # Clears the wasted effector
                     self._effectors.pop(sid)

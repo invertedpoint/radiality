@@ -43,7 +43,10 @@ class Connector(watch.Loggable):
             raise Exception()
 
         self._host = config.get('host', None)
-        self._port = config.get('port', None)
+        try:
+            self._port = int(config.get('port', None))
+        except ValueError:
+            raise Exception()
 
         if self._host and self._port:
             self._freq = utils.subsystem_freq(self._host, self._port)

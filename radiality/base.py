@@ -91,36 +91,32 @@ class Subsystem(watch.Loggable, circuit.Connectable):
     @asyncio.coroutine
     def _receiver(self, channel, path):
         try:
-            signal = yield from channel.recv()
+            data = yield from channel.recv()
+            data = json.loads(data)
         except ConnectionClosed:
             self.fail('Connection closed')
+        except ValueError:
+            self.fail('Invalid input -- could not decode data: %s', str(data))
         else:
-            try:
-                signal = json.loads(signal)
-            except ValueError:
-                self.fail(
-                    'Invalid in-signal -- could not decode the signal body'
-                )
-            else:
-                yield from self._parse(signal, channel)
+            yield from self._parse(data, channel)
 
     @asyncio.coroutine
-    def _parse(self, signal, channel):
-        event = signal.get('event', None)
-        sid = signal.get('sid', None)
+    def _parse(self, data, channel):
+        signal = data.get('*signal', None)
+        sid = data.get('sid', None)
 
-        if event == 'connecting':
-            freq = signal.get('freq', None)
+        if signal == 'connecting':
+            freq = data.get('freq', None)
             channel = yield from self._eventer_inst.connect(sid, freq)
-        elif event == 'connected':
+        elif signal == 'connected':
             self.log('Connected to `%s`', sid)
-        elif event == 'biconnected':
+        elif signal == 'biconnected':
             self.log('Biconnected to `%s`', sid)
             self._eventer_inst.register_effector(sid, channel)
-        elif event is None:
-            self.fail('Invalid in-signal -- could not decode the signal body')
+        elif signal is None:
+            self.fail('Invalid input -- could not decode data: %s', str(data))
         else:
-            self.warn('Unknown event -- {0}'.format(event))
+            self.warn('Unknown signal -- %s', str(signal))
 
         if sid in self.wanted:
             self.unwanted(sid)
