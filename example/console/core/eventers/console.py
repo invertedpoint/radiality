@@ -11,10 +11,8 @@ class Eventer(radiality.Eventer):
     The `console` eventer
     """
 
-    # event
-    @asyncio.coroutine
+    @radiality.event
     def ping(self):
         self.log('please stand by...')
         yield from asyncio.sleep(1)
         self.log('ping...')
-        yield from self.actualize(event='ping')

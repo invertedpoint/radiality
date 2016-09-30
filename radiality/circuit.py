@@ -43,7 +43,10 @@ class Connector(watch.Loggable):
             raise Exception()
 
         self._host = config.get('host', None)
-        self._port = config.get('port', None)
+        try:
+            self._port = int(config.get('port', None))
+        except ValueError:
+            raise Exception()
 
         if self._host and self._port:
             self._freq = utils.subsystem_freq(self._host, self._port)
@@ -79,8 +82,8 @@ class Connector(watch.Loggable):
         while True:
             try:
                 channel = yield from websockets.connect(freq)
-            except ConnectionClosed:
-                self.warn('Connection failed. Waiting...')
+            except Exception as exc:
+                self.warn('Connection failed: %s. Waiting...', str(exc))
                 yield from asyncio.sleep(self.WAIT_TIME)
             else:
                 break

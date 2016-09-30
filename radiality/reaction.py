@@ -14,13 +14,33 @@ from radiality import watch
 from radiality import circuit
 
 
+def effect(method):
+    """
+    Decorator for the definition of an effect
+    """
+    method._is_effect = True
+
+    return asyncio.coroutine(method)
+
+
 class Effector(watch.Loggable, circuit.Connectable):
     """
     Receiver of the specific events
     """
     _eventer = None  # type: Eventer
+    _channel = None  # type: WebSocketServerProtocol
+
     _effects = {}  # type: dict of str -> method
-    _channel = None
+
+    def __new__(cls, *args, **kwargs):
+        """
+        Pre-initialization
+        """
+        for (name, method) in cls.__dict__.items():
+            if getattr(method, '_is_effect', False):
+                cls._effects[name] = method
+
+        return super().__new__(cls, *args, **kwargs)
 
     def __init__(self, logger, connector, eventer, channel):
         """
@@ -31,6 +51,10 @@ class Effector(watch.Loggable, circuit.Connectable):
 
         self._eventer = eventer
         self._channel = channel
+
+    @property
+    def eventer(self):
+        return self._eventer
 
     # overridden from `circuit.Connectable`
     @asyncio.coroutine
@@ -44,39 +68,37 @@ class Effector(watch.Loggable, circuit.Connectable):
     @asyncio.coroutine
     def activate(self):
         try:
-            signal = yield from self._channel.recv()
-            signal = json.loads(signal)
+            data = yield from self._channel.recv()
+            data = json.loads(data)
         except ConnectionClosed:
             self.warn('Connection closed')
         except ValueError:
-            self.fail('Invalid in-signal -- could not decode the signal body')
+            self.fail('Invalid input -- could not decode data: %s', str(data))
         else:
-            yield from self._parse(signal)
+            yield from self._parse(data)
             return True
 
         return False
 
     @asyncio.coroutine
     def _connecting(self, channel):
-        signal = {'event': 'connecting', 'sid': self.sid, 'freq': self.freq}
+        data = {'*signal': 'connecting', 'sid': self.sid, 'freq': self.freq}
 
         try:
-            signal = json.dumps(signal)
+            data = json.dumps(data)
+            yield from channel.send(data)
         except ValueError:
-            self.fail('Invalid out-signal -- could not decode the signal body')
-        else:
-            try:
-                yield from channel.send(signal)
-            except ConnectionClosed:
-                self.fail('Connection closed')
+            self.fail('Invalid output -- could not decode data: %s', str(data))
+        except ConnectionClosed:
+            self.fail('Connection closed')
 
     @asyncio.coroutine
-    def _parse(self, signal):
-        event = signal.get('event', None)
+    def _parse(self, data):
+        event = data.get('*event', None)
 
         if event in self._effects:
-            yield from self._effects[event](self, signal)
+            yield from self._effects[event](self, data)
         elif event is None:
-            self.fail('Invalid in-signal -- could not decode the signal body')
+            self.fail('Invalid input -- could not decode data: %s', str(data))
         else:
             self.warn('Unknown event -- {0}'.format(event))
