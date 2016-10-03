@@ -37,7 +37,7 @@ class Eventer(watch.Loggable, circuit.Connectable):
     """
     Emitter of the specific events
     """
-    _effectors = {}
+    _effectors = None
 
     def __init__(self, logger, connector):
         """
@@ -45,6 +45,8 @@ class Eventer(watch.Loggable, circuit.Connectable):
         """
         self._logger = logger
         self._connector = connector
+
+        self._effectors = {}
 
     # overridden from `circuit.Connectable`
     @asyncio.coroutine
@@ -126,3 +128,4 @@ class Eventer(watch.Loggable, circuit.Connectable):
                     self.warn('Connection to `%s` closed', sid)
                     # Clears the wasted effector
                     self._effectors.pop(sid)
+                    yield from self.effector_disconnected(sid)

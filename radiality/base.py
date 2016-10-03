@@ -38,7 +38,7 @@ class Subsystem(watch.Loggable, circuit.Connectable):
         self._connector = circuit.Connector(
             logger=self._logger,
             config_path=connection_config,
-            wanted=list(self.effectors.keys())
+            wanted=self.effectors.keys()
         )
 
         if self.eventer:
@@ -119,7 +119,6 @@ class Subsystem(watch.Loggable, circuit.Connectable):
             self.warn('Unknown signal -- %s', str(signal))
 
         if sid in self.wanted:
-            self.unwanted(sid)
             yield from self._receiving(sid, channel)
 
     @asyncio.coroutine

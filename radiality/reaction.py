@@ -30,12 +30,13 @@ class Effector(watch.Loggable, circuit.Connectable):
     _eventer = None  # type: Eventer
     _channel = None  # type: WebSocketServerProtocol
 
-    _effects = {}  # type: dict of str -> method
+    _effects = None  # type: dict of str -> method
 
     def __new__(cls, *args, **kwargs):
         """
         Pre-initialization
         """
+        cls._effects = {}
         for (name, method) in cls.__dict__.items():
             if getattr(method, '_is_effect', False):
                 cls._effects[name] = method

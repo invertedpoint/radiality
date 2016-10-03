@@ -25,7 +25,7 @@ class Connector(watch.Loggable):
     _host = None  # type: str
     _port = None  # type: int
     _freq = None  # type: str
-    _wanted = []  # type: list of str
+    _wanted = None  # type: list of str
 
     def __init__(self, logger, config_path, wanted):
         """
@@ -99,9 +99,6 @@ class Connector(watch.Loggable):
         finally:
             del channel
 
-    def unwanted(self, sid):
-        self._wanted.remove(sid)
-
 
 class Connectable:
     """
@@ -137,6 +134,3 @@ class Connectable:
     @asyncio.coroutine
     def disconnect(self, sid, channel):
         yield from self._connector.disconnect(sid, channel)
-
-    def unwanted(self, sid):
-        self._connector.unwanted(sid)
