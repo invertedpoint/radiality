@@ -134,4 +134,7 @@ class Subsystem(watch.Loggable, circuit.Connectable):
 
         receiving = True
         while receiving:
-            receiving = yield from effector_inst.activate()
+            try:
+                receiving = yield from effector_inst.activate()
+            except Exception as exc:
+                self.log(exc, exc_info=True)
