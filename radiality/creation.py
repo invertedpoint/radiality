@@ -5,6 +5,7 @@ The `radiality/creation.py` is a part of `radiality`.
 Apache 2.0 licensed.
 """
 
+from itertools import zip_longest
 from functools import wraps
 import json
 
@@ -20,13 +21,22 @@ def event(method):
     Decorator for the definition of an event
     """
     method = asyncio.coroutine(method)
+    # Constructs the event specification template
+    names = method.__code__.co_varnames[::-1]
+    defaults = method.__defaults__[::-1]
+    spec_tmpl = list(zip_longest(names, defaults))[::-1]
+    spec_tmpl.append(('*event', method.__name__))
 
     @wraps(method)
-    def _wrapper(self, **kwargs):
-        yield from method(self, **kwargs)
-        yield from self._actualize(
-            event=method.__name__, details=(kwargs or None)
-        )
+    def _wrapper(self, *args, **kwargs):
+        spec = {
+            name: (value if arg is None else arg)
+            for ((name, value), arg) in zip_longest(spec_tmpl, args)
+        }
+        spec.update(kwargs)
+
+        yield from method(self, *args, **kwargs)
+        yield from self._actualize(spec)
 
     _wrapper._is_event = True
 
@@ -93,16 +103,9 @@ class Eventer(watch.Loggable, circuit.Connectable):
         pass
 
     @asyncio.coroutine
-    def _transmit(self, signal, channel, details=None):
-        data = {'*signal': signal}
-        if details:
-            data.update(details)
-
+    def _transmit(self, channel, spec):
         try:
-            data = json.dumps(data)
-            yield from channel.send(data)
-        except ValueError:
-            self.fail('Invalid output -- could not decode data: %s', str(data))
+            yield from channel.send(spec)
         except ConnectionClosed:
             self.fail('Connection closed')
         else:
@@ -111,19 +114,15 @@ class Eventer(watch.Loggable, circuit.Connectable):
         return False
 
     @asyncio.coroutine
-    def _actualize(self, event, details=None):
-        data = {'*event': event}
-        if details:
-            data.update(details)
-
+    def _actualize(self, spec):
         try:
-            data = json.dumps(data)
+            spec = json.dumps(spec)
         except ValueError:
-            self.fail('Invalid output -- could not decode data: %s', str(data))
+            self.fail('Invalid output -- could not decode data: %s', str(spec))
         else:
             for (sid, channel) in list(self._effectors.items()):
                 try:
-                    yield from channel.send(data)
+                    yield from channel.send(spec)
                 except ConnectionClosed:
                     self.warn('Connection to `%s` closed', sid)
                     # Clears the wasted effector
