@@ -19,9 +19,11 @@ def effect(method):
     """
     Decorator for the definition of an `effect`
     """
-    method = asyncio.coroutine(method)
     # Stores the `effect` specification keys
-    effect_spec_keys = set(method.__code__.co_varnames)
+    n = method.__code__.co_argcount
+    effect_spec_keys = set(method.__code__.co_varnames[1:n])
+
+    method = asyncio.coroutine(method)
 
     @wraps(method)
     def _wrapper(self, event_spec):
@@ -29,6 +31,7 @@ def effect(method):
             yield from method(self, **event_spec)
         else:
             self._specs_keys_conflict(
+                event=method.__name__,
                 event_spec_keys=set(event_spec.keys()),
                 effect_spec_keys=effect_spec_keys
             )
@@ -128,9 +131,9 @@ class Effector(watch.Loggable, circuit.Connectable):
         else:
             self.warn('Unknown event -- {0}'.format(event))
 
-    def _specs_keys_conflict(self, event_spec_keys, effect_spec_keys):
+    def _specs_keys_conflict(self, event, event_spec_keys, effect_spec_keys):
         self.fail(
             'The `event` specification keys did not match the `effect` '
-            'specification keys: %s vs. %s',
-            str(event_spec_keys), str(effect_spec_keys)
+            'specification keys: `%s` -> %s vs. %s',
+            event, str(event_spec_keys), str(effect_spec_keys)
         )
