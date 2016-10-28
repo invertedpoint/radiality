@@ -18,20 +18,20 @@ from radiality import circuit
 
 def event(method):
     """
-    Decorator for the definition of an event
+    Decorator for the definition of an `event`
     """
     method = asyncio.coroutine(method)
-    # Constructs the event specification template
-    names = method.__code__.co_varnames[::-1]
+    # Constructs the `event` specification template
+    keys = method.__code__.co_varnames[::-1]
     defaults = method.__defaults__[::-1]
-    spec_tmpl = list(zip_longest(names, defaults))[::-1]
+    spec_tmpl = list(zip_longest(keys, defaults))[::-1]
     spec_tmpl.append(('*event', method.__name__))
 
     @wraps(method)
     def _wrapper(self, *args, **kwargs):
         spec = {
-            name: (value if arg is None else arg)
-            for ((name, value), arg) in zip_longest(spec_tmpl, args)
+            key: (value if arg is None else arg)
+            for ((key, value), arg) in zip_longest(spec_tmpl, args)
         }
         spec.update(kwargs)
 
@@ -84,17 +84,20 @@ class Eventer(watch.Loggable, circuit.Connectable):
 
     @asyncio.coroutine
     def effector_connected(self, sid, freq):
-        data = {
+        spec = {
             '*signal': ('biconnected' if sid in self.wanted else 'connected'),
             'sid': self.sid,
             'freq': self.freq
         }
 
         try:
-            data = json.dumps(data)
-            yield from self._effectors[sid].send(data)
+            spec = json.dumps(spec)
+            yield from self._effectors[sid].send(spec)
         except ValueError:
-            self.fail('Invalid output -- could not decode data: %s', str(data))
+            self.fail(
+                'Invalid output -- '
+                'could not encode the signal specification: %s', str(spec)
+            )
         except ConnectionClosed:
             self.fail('Connection closed')
 
@@ -118,7 +121,10 @@ class Eventer(watch.Loggable, circuit.Connectable):
         try:
             spec = json.dumps(spec)
         except ValueError:
-            self.fail('Invalid output -- could not decode data: %s', str(spec))
+            self.fail(
+                'Invalid output -- '
+                'could not encode the event specification: %s', str(spec)
+            )
         else:
             for (sid, channel) in list(self._effectors.items()):
                 try:

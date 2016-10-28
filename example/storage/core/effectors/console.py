@@ -11,6 +11,6 @@ class Effector(radiality.Effector):
     """
 
     @radiality.effect
-    def ping(self, signal):
+    def ping(self):
         self.log('Console -> ping')
         yield from self.eventer.pong()

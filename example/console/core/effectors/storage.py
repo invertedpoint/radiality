@@ -11,5 +11,5 @@ class Effector(radiality.Effector):
     """
 
     @radiality.effect
-    def pong(self, signal):
+    def pong(self):
         self.log('Storage -> pong')
