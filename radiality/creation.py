@@ -23,7 +23,7 @@ def event(method):
     method = asyncio.coroutine(method)
     # Constructs the `event` specification template
     keys = method.__code__.co_varnames[::-1]
-    defaults = method.__defaults__[::-1]
+    defaults = (method.__defaults__ or ())[::-1]
     spec_tmpl = list(zip_longest(keys, defaults))[::-1]
     spec_tmpl.append(('*event', method.__name__))
 
