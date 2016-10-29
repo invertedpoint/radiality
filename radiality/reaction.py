@@ -5,6 +5,7 @@ The `radiality/reaction.py` is a part of `radiality`.
 Apache 2.0 licensed.
 """
 
+from functools import wraps
 import json
 
 import asyncio
@@ -16,11 +17,28 @@ from radiality import circuit
 
 def effect(method):
     """
-    Decorator for the definition of an effect
+    Decorator for the definition of an `effect`
     """
-    method._is_effect = True
+    # Stores the `effect` specification keys
+    n = method.__code__.co_argcount
+    effect_spec_keys = set(method.__code__.co_varnames[1:n])
 
-    return asyncio.coroutine(method)
+    method = asyncio.coroutine(method)
+
+    @wraps(method)
+    def _wrapper(self, event_spec):
+        if set(event_spec.keys()) == effect_spec_keys:
+            yield from method(self, **event_spec)
+        else:
+            self._specs_keys_conflict(
+                event=method.__name__,
+                event_spec_keys=set(event_spec.keys()),
+                effect_spec_keys=effect_spec_keys
+            )
+
+    _wrapper._is_effect = True
+
+    return asyncio.coroutine(_wrapper)
 
 
 class Effector(watch.Loggable, circuit.Connectable):
@@ -30,12 +48,13 @@ class Effector(watch.Loggable, circuit.Connectable):
     _eventer = None  # type: Eventer
     _channel = None  # type: WebSocketServerProtocol
 
-    _effects = {}  # type: dict of str -> method
+    _effects = None  # type: dict of str -> method
 
     def __new__(cls, *args, **kwargs):
         """
         Pre-initialization
         """
+        cls._effects = {}
         for (name, method) in cls.__dict__.items():
             if getattr(method, '_is_effect', False):
                 cls._effects[name] = method
@@ -68,37 +87,53 @@ class Effector(watch.Loggable, circuit.Connectable):
     @asyncio.coroutine
     def activate(self):
         try:
-            data = yield from self._channel.recv()
-            data = json.loads(data)
+            spec = yield from self._channel.recv()
+            spec = json.loads(spec)
         except ConnectionClosed:
             self.warn('Connection closed')
+            return False
         except ValueError:
-            self.fail('Invalid input -- could not decode data: %s', str(data))
+            self.fail(
+                'Invalid input -- '
+                'could not decode the event specification: %s', str(spec)
+            )
         else:
-            yield from self._parse(data)
-            return True
+            yield from self._parse(spec)
 
-        return False
+        return True
 
     @asyncio.coroutine
     def _connecting(self, channel):
-        data = {'*signal': 'connecting', 'sid': self.sid, 'freq': self.freq}
+        spec = {'*signal': 'connecting', 'sid': self.sid, 'freq': self.freq}
 
         try:
-            data = json.dumps(data)
-            yield from channel.send(data)
+            spec = json.dumps(spec)
+            yield from channel.send(spec)
         except ValueError:
-            self.fail('Invalid output -- could not decode data: %s', str(data))
+            self.fail(
+                'Invalid output -- '
+                'could not encode the signal specification: %s', str(spec)
+            )
         except ConnectionClosed:
             self.fail('Connection closed')
 
     @asyncio.coroutine
-    def _parse(self, data):
-        event = data.get('*event', None)
+    def _parse(self, spec):
+        event = spec.pop('*event', None)
 
         if event in self._effects:
-            yield from self._effects[event](self, data)
+            yield from self._effects[event](self, spec)
         elif event is None:
-            self.fail('Invalid input -- could not decode data: %s', str(data))
+            self.fail(
+                'Invalid input -- '
+                'could not decode the event specification: %s', str(spec)
+            )
         else:
             self.warn('Unknown event -- {0}'.format(event))
+
+    def _specs_keys_conflict(self, event, event_spec_keys, effect_spec_keys):
+        self.fail(
+            'The `event` specification keys did not match the `effect` '
+            'specification keys: `%s` -> %s vs. %s',
+            event, str(event_spec_keys), str(effect_spec_keys)
+        )

@@ -11,9 +11,7 @@ class Effector(radiality.Effector):
     """
 
     @radiality.effect
-    def systemized(self, signal):
-        subsystems = signal.get('subsystems', [])
-
+    def systemized(self, subsystems):
         for (sid, freq) in subsystems:
             if sid in self.wanted:
                 yield from self.connect(sid, freq)
