@@ -8,7 +8,7 @@ Apache 2.0 licensed.
 import yaml
 
 MSG_TIMEOUT = 1800  # 1800 sec
-MSG_MAX_SIZE = 12 * 2 ** 20  # 12 Mb
+MSG_MAX_SIZE = 12 * 2 ** 20  # 12 MB
 
 
 def subsystem_freq(host, port):
