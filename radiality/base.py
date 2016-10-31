@@ -61,7 +61,9 @@ class Subsystem(watch.Loggable, circuit.Connectable):
             serving = websockets.serve(
                 ws_handler=self._receiver,
                 host=self.host,
-                port=self.port
+                port=self.port,
+                timeout=1800,
+                max_size=12 * 2 ** 20
             )
             event_loop.run_until_complete(serving)
 

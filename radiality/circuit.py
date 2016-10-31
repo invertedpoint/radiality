@@ -81,7 +81,8 @@ class Connector(watch.Loggable):
 
         while True:
             try:
-                channel = yield from websockets.connect(freq)
+                channel = yield from websockets.connect(freq, timeout=1800,
+                                                        max_size=12 * 2 ** 20)
             except Exception as exc:
                 self.warn('Connection failed: %s. Waiting...', str(exc))
                 yield from asyncio.sleep(self.WAIT_TIME)

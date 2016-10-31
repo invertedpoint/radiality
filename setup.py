@@ -12,7 +12,7 @@ README = io.open('README.md', 'r', encoding='utf-8').read()
 
 REQUIRES = [
     'asyncio==3.4.3',
-    'websockets==3.1',
+    'websockets==3.2',
     'PyYAML==3.11'
 ]
 
