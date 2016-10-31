@@ -13,6 +13,7 @@ from websockets.exceptions import ConnectionClosed
 
 from radiality.reaction import Effector
 from radiality import watch
+from radiality import utils
 from radiality import circuit
 
 
@@ -62,8 +63,8 @@ class Subsystem(watch.Loggable, circuit.Connectable):
                 ws_handler=self._receiver,
                 host=self.host,
                 port=self.port,
-                timeout=1800,
-                max_size=12 * 2 ** 20
+                timeout=utils.MSG_TIMEOUT,
+                max_size=utils.MSG_MAX_SIZE
             )
             event_loop.run_until_complete(serving)
 
