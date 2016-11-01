@@ -7,12 +7,16 @@ Apache 2.0 licensed.
 
 import yaml
 
+
 MSG_TIMEOUT = 1800  # 1800 sec
 MSG_MAX_SIZE = 12 * 2 ** 20  # 12 MB
 
 
-def subsystem_freq(host, port):
-    return 'ws://{host}:{port}'.format(host=host, port=str(port))
+def subsystem_freq(host, port, point=None):
+    if not point:
+        point = '{host}:{port}'.format(host=host, port=port)
+
+    return '{scheme}://{point}'.format(scheme='ws', point=point)
 
 
 def load_config(config_path):

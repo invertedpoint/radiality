@@ -7,4 +7,4 @@ Apache 2.0 licensed.
 Current version of `radiality`.
 """
 
-__version__ = '0.5.1'
+__version__ = '0.5.2'
