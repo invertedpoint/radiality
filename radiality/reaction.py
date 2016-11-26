@@ -7,8 +7,8 @@ Apache 2.0 licensed.
 
 from functools import wraps
 import json
-
 import asyncio
+
 from websockets.exceptions import ConnectionClosed
 
 from radiality import watch
@@ -59,7 +59,7 @@ class Effector(watch.Loggable, circuit.Connectable):
             if getattr(method, '_is_effect', False):
                 cls._effects[name] = method
 
-        return super().__new__(cls, *args, **kwargs)
+        return super().__new__(cls)
 
     def __init__(self, logger, connector, eventer, channel):
         """

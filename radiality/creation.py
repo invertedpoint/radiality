@@ -8,8 +8,8 @@ Apache 2.0 licensed.
 from itertools import zip_longest
 from functools import wraps
 import json
-
 import asyncio
+
 from websockets.exceptions import ConnectionClosed
 
 from radiality import watch
