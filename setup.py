@@ -11,9 +11,8 @@ VERSION = imp.load_source(
 README = io.open('README.md', 'r', encoding='utf-8').read()
 
 REQUIRES = [
-    'asyncio==3.4.3',
     'websockets==3.2',
-    'PyYAML==3.11'
+    'PyYAML==3.12'
 ]
 
 setup(
@@ -35,15 +34,11 @@ setup(
         'Topic :: Software Development :: Libraries :: Application Frameworks',
         'Programming Language :: Python',
         'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
-        'Programming Language :: Python :: Implementation :: Jython',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5'
     ],
-    keywords='wsgi web framework api rest microservice reactive architecture',
+    keywords='web framework api websocket microservice reactive architecture',
     author='Max Sukhorukov',
     author_email='signaldetect@gmail.com',
     url='https://github.com/signaldetect/radiality',

@@ -6,8 +6,8 @@ Apache 2.0 licensed.
 """
 
 import json
-
 import asyncio
+
 import websockets
 from websockets.exceptions import ConnectionClosed
 
