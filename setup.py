@@ -11,8 +11,7 @@ VERSION = imp.load_source(
 README = io.open('README.md', 'r', encoding='utf-8').read()
 
 REQUIRES = [
-    'websockets==3.2',
-    'PyYAML==3.12'
+    'websockets==3.2'
 ]
 
 setup(
@@ -35,8 +34,8 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5'
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6'
     ],
     keywords='web framework api websocket microservice reactive architecture',
     author='Max Sukhorukov',

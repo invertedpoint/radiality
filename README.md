@@ -7,19 +7,18 @@ Radiality is designed to program business logic of web-applications with
 reactive](http://en.wikipedia.org/wiki/Reactive_programming#Object-oriented)
 architecture.
 
+## Requirements
+
+* Python >= 3.5.2
+* [websockets](https://pypi.python.org/pypi/websockets)
+
 ## How to use
 
 Install via `$ pip install radiality`.
 
-## Example
+## Examples
 
-Take a look at the sample application in the [example](./example) directory.
-Run the sample application via:
-
-```
-$ cd example/
-$ sudo docker-compose up -d
-```
+Take a look at the sample applications in the [examples](./examples) directory.
 
 ## License
 
