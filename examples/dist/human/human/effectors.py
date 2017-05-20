@@ -9,18 +9,18 @@ from radiality import Effector
 class Family(Effector):
 
     @effect
-    def gathered(self):
+    async def gathered(self):
         """
         self: human.core.Human
         """
         # Causes the `hello_said` event
-        self.hello_said()
+        await self.hello_said()
 
 
 class Animal(Effector):
 
     @effect
-    def sound_made(self, name):
+    async def sound_made(self, name):
         """
         self: human.core.Human
         name: str

@@ -31,4 +31,4 @@ class Family(eventer.Family):
         self: family.core.Family
         """
         # Causes the `gathered` event
-        self.gathered()
+        await self.gathered()

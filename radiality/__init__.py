@@ -5,11 +5,11 @@ The `radiality/__init__.py` is a part of `radiality`.
 Apache 2.0 licensed.
 """
 
-from radiality.mutability import event
-from radiality.mutability import Eventer
-from radiality.sensority import effect
-from radiality.sensority import Effector
-from radiality.cyclicity import Ring
+from radiality.nonlinear import event
+from radiality.nonlinear import Eventer
+from radiality.nonlinear import effect
+from radiality.nonlinear import Effector
+from radiality.linear import Ring
 
 
 __all__ = [

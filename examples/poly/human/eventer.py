@@ -9,7 +9,7 @@ from radiality import Eventer
 class Human(Eventer):
 
     @event
-    def hello_said(self):
+    async def hello_said(self):
         """
         self: human.core.Human
         """

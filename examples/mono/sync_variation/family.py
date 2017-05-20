@@ -1,11 +1,9 @@
 """
-radiality:examples:mono:family
+radiality:examples:mono:sync_variation:family
 """
 
-import asyncio
-
-from radiality import event
-from radiality import Eventer
+from radiality.linear import event
+from radiality.linear import Eventer
 
 from human import ManCore
 from human import WomanCore
@@ -15,7 +13,7 @@ from animal import DogCore
 class Family(Eventer):
 
     @event
-    async def gathered(self):
+    def gathered(self):
         """
         self: family.FamilyCore
         """
@@ -44,21 +42,5 @@ class FamilyCore(Family):
         """
         self: family.FamilyCore
         """
-        def _stop(current_task):
-            for task in asyncio.Task.all_tasks():
-                if task != current_task:
-                    task.cancel()
-
-        loop = asyncio.get_event_loop()
-
-        try:
-            # Causes the `gathered` event
-            loop.run_until_complete(self.gathered())
-
-            current_task = asyncio.ensure_future(
-                asyncio.wait(asyncio.Task.all_tasks())
-            )
-            loop.call_later(3, _stop, current_task)
-            loop.run_until_complete(current_task)
-        finally:
-            loop.close()
+        # Causes the `gathered` event
+        self.gathered()

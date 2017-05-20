@@ -1,17 +1,17 @@
 """
-radiality:examples:mono:animal
+radiality:examples:mono:sync_variation:animal
 """
 
-from radiality import event
-from radiality import Eventer
-from radiality import effect
-from radiality import Effector
+from radiality.linear import event
+from radiality.linear import Eventer
+from radiality.linear import effect
+from radiality.linear import Effector
 
 
 class Animal(Eventer):
 
     @event
-    async def sound_made(self, name):
+    def sound_made(self, name):
         """
         self: animal.AnimalCore
         name: str
@@ -22,12 +22,12 @@ class Animal(Eventer):
 class Human(Effector):
 
     @effect
-    async def hello_said(self):
+    def hello_said(self):
         """
         self: animal.AnimalCore
         """
         # Causes the `sound_made` event
-        await self.sound_made(name=self._name)
+        self.sound_made(name=self._name)
 
 
 class AnimalCore(Animal, Human):

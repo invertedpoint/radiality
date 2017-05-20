@@ -9,7 +9,7 @@ from radiality import Eventer
 class Family(Eventer):
 
     @event
-    def gathered(self):
+    async def gathered(self):
         """
         self: family.core.Family
         """

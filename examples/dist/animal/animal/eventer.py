@@ -9,7 +9,7 @@ from radiality import Eventer
 class Animal(Eventer):
 
     @event
-    def sound_made(self, name):
+    async def sound_made(self, name):
         """
         self: animal.core.Animal
         name: str
