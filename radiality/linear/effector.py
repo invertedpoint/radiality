@@ -6,18 +6,6 @@ Apache 2.0 licensed.
 """
 
 
-def sync_effect(method):
-    """
-    method: Callable[..., None]
-
-    return: Callable[..., None]
-
-    Decorator for the definition of an `effect`.
-    """
-    setattr(method, 'IS_EFFECT', True)
-    return method
-
-
 class SyncEffector:
     WANTED = None  # type: Dict[str, Type]
     EFFECTS = None  # type: Dict[str, Callable[..., None]]
@@ -35,7 +23,9 @@ class SyncEffector:
             cls.WANTED = {
                 base_cls.__name__: base_cls
                 for base_cls in cls.__mro__
-                if len(effector_types.intersection(base_cls.__bases__)) > 0
+                if (base_cls not in effector_types) and (
+                    len(effector_types.intersection(base_cls.__bases__)) > 0
+                )
             }
 
         if cls.EFFECTS is None:

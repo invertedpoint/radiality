@@ -11,21 +11,9 @@ import asyncio
 from radiality.linear.effector import SyncEffector
 
 
-def async_effect(method):
-    """
-    method: Callable[..., None]
-
-    return: Callable[..., None]
-
-    Decorator for the definition of an `effect`.
-    """
-    setattr(method, 'IS_EFFECT', True)
-    return method
-
-
 class AsyncEffector(SyncEffector):
     _events = None  # type: asyncio.Queue
-    _task = None  # type: asyncio.Task
+    _impactor = None  # type: asyncio.Task
 
     def _effector_types():
         """
@@ -33,7 +21,7 @@ class AsyncEffector(SyncEffector):
 
         Overridden from `SyncEffector`.
         """
-        return {SyncEffector, AsyncEffector}
+        return SyncEffector._effector_types().union({AsyncEffector})
 
     def __init__(self):
         """
@@ -41,8 +29,10 @@ class AsyncEffector(SyncEffector):
         """
         super().__init__()
 
-        self._events = asyncio.Queue()
-        self._task = asyncio.ensure_future(self._impacting())
+        if self._events is None:
+            self._events = asyncio.Queue()
+        if self._impactor is None:
+            self._impactor = asyncio.ensure_future(self._impacting())
 
     async def add_event(self, event_props):
         """

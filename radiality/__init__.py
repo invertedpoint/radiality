@@ -6,10 +6,10 @@ Apache 2.0 licensed.
 """
 
 from radiality.nonlinear import event
-from radiality.nonlinear import Eventer
+from radiality.decentral import Eventer
 from radiality.nonlinear import effect
-from radiality.nonlinear import Effector
-from radiality.linear import Ring
+from radiality.decentral import Effector
+from radiality.decentral import Ring
 
 
 __all__ = [

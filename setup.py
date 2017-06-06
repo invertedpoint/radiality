@@ -11,7 +11,7 @@ VERSION = imp.load_source(
 README = io.open('README.md', 'r', encoding='utf-8').read()
 
 REQUIRES = [
-    'websockets==3.2'
+    'websockets==3.3'
 ]
 
 setup(

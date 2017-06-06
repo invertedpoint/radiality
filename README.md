@@ -10,7 +10,6 @@ architecture.
 ## Requirements
 
 * Python >= 3.5.2
-* [websockets](https://pypi.python.org/pypi/websockets)
 
 ## How to use
 
