@@ -13,5 +13,6 @@ class Human(Effector):
         """
         self: animal.core.Animal
         """
+        print(self.SOUND)
         # Causes the `sound_made` event
         await self.sound_made(name=self._name)

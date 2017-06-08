@@ -8,7 +8,6 @@ from family import eventer
 
 
 class Family(eventer.Family):
-    _task = None  # type: asyncio.Task
 
     def attract(self, ring):
         """
@@ -26,30 +25,32 @@ class Family(eventer.Family):
         loop = asyncio.get_event_loop()
 
         try:
+            self._intro()
+            # Waits more than `radiality.Eventer.RECONN_WAIT_TIME` sec
+            # TODO: Explain this ^^^
+            loop.run_until_complete(asyncio.sleep(2))
             # Causes the `gathered` event
             loop.run_until_complete(self.gathered())
-
-            self._task = asyncio.ensure_future(
-                asyncio.wait(asyncio.Task.all_tasks())
-            )
-            loop.call_later(3, self._stop)
-
-            print('The `{0}` core running...'.format(self.CORE_ID))
-            channel_uri = self.channel_uri()
-            if channel_uri:
-                print('and it is available at [{0}]...'.format(channel_uri))
-
-            loop.run_until_complete(self._task)
+            # Runs the infinite event loop
+            loop.run_forever()
         except KeyboardInterrupt:
             pass
         finally:
-            print('\nThe `{0}` core is stopped'.format(self.CORE_ID))
+            self._outro()
+            # Exit
             loop.close()
 
-    def _stop(self):
+    def _intro(self):
         """
         self: family.core.Family
         """
-        for task in asyncio.Task.all_tasks():
-            if task != self._task:
-                task.cancel()
+        print('The `{0}` core running...'.format(self.__class__.__name__))
+        channel_uri = self.channel_uri()
+        if channel_uri:
+            print('and it is available at [{0}]...'.format(channel_uri))
+
+    def _outro(self):
+        """
+        self: family.core.Family
+        """
+        print('\nThe `{0}` core is stopped'.format(self.__class__.__name__))

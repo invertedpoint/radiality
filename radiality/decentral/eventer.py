@@ -80,7 +80,7 @@ class TeleEventer(AsyncEventer, TeleRing):
             except Exception as exc:
                 conn_shot += 1
                 # TODO: logging the shot
-                print('Shot {0}'.format(conn_shot))
+                print('[Connection shot {0}]'.format(conn_shot))
                 await asyncio.sleep(self.RECONN_WAIT_TIME)
 
         return channel

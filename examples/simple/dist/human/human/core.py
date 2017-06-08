@@ -18,20 +18,20 @@ class Human(eventer.Human, effectors.Family, effectors.Animal):
 
         self._name = name
 
-    def arise(self):
+    def intro(self):
         """
         self: human.core.Human
         """
-        print('The `{0}` core running...'.format(self.CORE_ID))
+        print('The `{0}` core running...'.format(self.__class__.__name__))
         channel_uri = self.channel_uri()
         if channel_uri:
             print('and it is available at [{0}]...'.format(channel_uri))
 
-    def vanish(self):
+    def outro(self):
         """
         self: human.core.Human
         """
-        print('\nThe `{0}` core is stopped'.format(self.CORE_ID))
+        print('\nThe `{0}` core is stopped'.format(self.__class__.__name__))
 
 
 class Man(Human):
