@@ -2,7 +2,7 @@
 radiality:examples:simple:sync_mono:main
 """
 
-from radiality import Ring
+from radiality.linear import Ring
 
 from family import FamilyCore
 
