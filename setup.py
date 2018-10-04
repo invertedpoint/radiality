@@ -11,7 +11,7 @@ VERSION = imp.load_source(
 README = io.open('README.md', 'r', encoding='utf-8').read()
 
 REQUIRES = [
-    'websockets==3.3'
+    'websockets==6.0'
 ]
 
 setup(
@@ -35,12 +35,13 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6'
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7'
     ],
     keywords='web framework api websocket microservice reactive architecture',
     author='Max Sukhorukov',
     author_email='signaldetect@gmail.com',
-    url='https://github.com/signaldetect/radiality',
+    url='https://github.com/invertedpoint/radiality',
     license='Apache 2.0',
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
