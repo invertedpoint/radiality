@@ -13,7 +13,7 @@ architecture.
 
 ## How to use
 
-Install via `$ pip install radiality`.
+Install via `$ pip install radiality` (soon to be on PyPI).
 
 ## Examples
 
