@@ -1,1 +1,1 @@
-Simple applications
+Simple distributed application
