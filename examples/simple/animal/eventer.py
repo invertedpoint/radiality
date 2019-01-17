@@ -12,6 +12,13 @@ class Animal(Eventer):
     """
 
     @event
+    async def came(self, name: str) -> None:
+        """
+        TODO: Add docstring
+        """
+        pass
+
+    @event
     async def sound_made(self, name: str) -> None:
         """
         TODO: Add docstring

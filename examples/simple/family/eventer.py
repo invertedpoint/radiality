@@ -12,6 +12,13 @@ class Family(Eventer):
     """
 
     @event
+    async def gathering(self) -> None:
+        """
+        TODO: Add docstring
+        """
+        pass
+
+    @event
     async def gathered(self) -> None:
         """
         TODO: Add docstring

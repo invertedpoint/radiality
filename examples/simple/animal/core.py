@@ -8,7 +8,7 @@ import eventer
 import effectors
 
 
-class Animal(eventer.Animal, effectors.Human):
+class Animal(eventer.Animal, effectors.Family, effectors.Human):
     """
     TODO: Add docstring
     """

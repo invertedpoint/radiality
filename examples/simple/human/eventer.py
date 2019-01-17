@@ -12,8 +12,15 @@ class Human(Eventer):
     """
 
     @event
-    async def hello_said(self) -> None:
+    async def came(self, name: str) -> None:
         """
         TODO: Add docstring
         """
-        print(f'Hello! -- {self._name} said.')
+        pass
+
+    @event
+    async def hello_said(self, name: str) -> None:
+        """
+        TODO: Add docstring
+        """
+        print(f'Hello! -- {name} said.')
