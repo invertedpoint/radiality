@@ -1,13 +1,9 @@
 """
-radiality:examples:simple:dist:animal:main
+radiality:examples:simple:animal:main
 """
 
-from radiality import Ring
-
-from animal import core
+import core
 
 
 if __name__ == '__main__':
-    core.Dog(name='Buddy').sensor('0.0.0.0', 50004).attract(
-        Ring().cohere('0.0.0.0', 50000)
-    ).arise()
+    core.Dog(name='Buddy').cohere('nats', '127.0.0.1', 4222).arise()

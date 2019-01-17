@@ -1,3 +1,3 @@
 #!/bin/bash
 
-exec $(pwd)/venv/bin/python $(pwd)/$1/main.py
+exec $(pwd)/_venv/bin/python3 $(pwd)/$1/main.py

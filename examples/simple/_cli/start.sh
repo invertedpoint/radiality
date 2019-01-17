@@ -1,11 +1,11 @@
 #!/bin/bash
 
-find $(pwd) -name "*.log" -delete
-find $(pwd) -name "*.log.*" -delete
+source $(pwd)/_cli/_clean_bytecode.sh
+source $(pwd)/_cli/_clean_logs.sh
 
-$(pwd)/venv/bin/supervisord -c $(pwd)/configs/supervisord.conf
+$(pwd)/_venv/bin/supervisord -c $(pwd)/_configs/supervisord.conf
 
-echo "Starting subsystem..."
-$(pwd)/venv/bin/supervisorctl -c $(pwd)/configs/supervisord.conf \
+echo "Starting system..."
+$(pwd)/_venv/bin/supervisorctl -c $(pwd)/_configs/supervisord.conf \
     start all
-echo "Subsystem started."
+echo "System started."

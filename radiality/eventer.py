@@ -29,7 +29,7 @@ class Eventer(Connectable):
         """
         TODO: Add docstring
         """
-        if not cls.CORE_ID:
+        if not hasattr(cls, 'CORE_ID'):
             eventer_cls = Eventer
             core_ids = [
                 base_cls.__name__
@@ -73,8 +73,3 @@ class Eventer(Connectable):
             print(
                 f'(i) Timeout occured when publishing "{event_path}": {exc}'
             )
-        '''
-        last_error = self.connection().last_error
-        if last_error is not None:
-            print(f'(i) Last error: {last_error}')
-        '''

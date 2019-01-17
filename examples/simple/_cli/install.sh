@@ -1,3 +1,3 @@
 #!/bin/bash
 
-$(pwd)/venv/bin/pip3 install -r $(pwd)/configs/requirements.txt
+$(pwd)/_venv/bin/python3 -m pip install -r $(pwd)/_configs/requirements.txt

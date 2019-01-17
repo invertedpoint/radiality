@@ -32,7 +32,7 @@ class Connectable:
         """
         TODO: Add docstring
         """
-        if not self._connection:
+        if not hasattr(self, '_connection'):
             self._connection = Client()
 
         return self._connection
@@ -79,7 +79,7 @@ class Connectable:
         """
         TODO: Add docstring
         """
-        print('(i) Connection to is closed')
+        print('(i) Connection is closed')
 
     async def _connect(self) -> None:
         """
@@ -101,4 +101,3 @@ class Connectable:
             print(f'(i) Could not connect to any server in the cluster: {exc}')
         else:
             await self.connected()
-

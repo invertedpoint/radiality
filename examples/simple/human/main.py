@@ -1,35 +1,35 @@
 """
-radiality:examples:simple:dist:family:main
+radiality:examples:simple:human:main
 """
 
+from typing import TypeVar
 import asyncio
 
-from radiality import Ring
+import core
 
-from human import core
+
+Self = TypeVar('Self', bound='Couple')
 
 
 class Couple:
-    _tom = None  # type: human.core.Man
-    _mary = None  # type: human.core.Woman
+    """
+    TODO: Add docstring
+    """
+    _tom: core.Man
+    _mary: core.Woman
 
-    def attract(self, ring):
+    def cohere(self, scheme: str, host: str, port: int) -> Self:
         """
-        self: main.Couple
-        ring: radiality.Ring
+        TODO: Add docstring
         """
-        self._tom = ring.focus(
-            core.Man(name='Tom').sensor('0.0.0.0', 50002)
-        )
-        self._mary = ring.focus(
-            core.Woman(name='Mary').sensor('0.0.0.0', 50003)
-        )
+        self._tom = core.Man(name='Tom').cohere(scheme, host, port)
+        self._mary = core.Woman(name='Mary').cohere(scheme, host, port)
 
         return self
 
     def arise(self):
         """
-        self: main.Couple
+        TODO: Add docstring
         """
         loop = asyncio.get_event_loop()
 
@@ -48,4 +48,4 @@ class Couple:
 
 
 if __name__ == '__main__':
-    Couple().attract(Ring().cohere('0.0.0.0', 50000)).arise()
+    Couple().cohere('nats', '127.0.0.1', 4222).arise()

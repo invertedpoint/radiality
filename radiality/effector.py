@@ -9,6 +9,7 @@ from typing import TypeVar
 from typing import Dict
 from typing import Type
 from typing import Callable
+from typing import Any
 import json
 import asyncio
 
@@ -34,7 +35,7 @@ class Effector(Connectable):
         """
         TODO: Add docstring
         """
-        if not cls.WANTED:
+        if not hasattr(cls, 'WANTED'):
             effector_types = {Effector}
             cls.WANTED = {
                 base_cls.__name__: base_cls
@@ -44,7 +45,7 @@ class Effector(Connectable):
                 )
             }
 
-        if not cls.EFFECTS:
+        if not hasattr(cls, 'EFFECTS'):
             cls.EFFECTS = {
                 ref.__qualname__: ref
                 for effector_cls in cls.WANTED.values()
@@ -60,21 +61,23 @@ class Effector(Connectable):
         """
         super().__init__()
 
-        if self._events is None:
+        if not hasattr(self, '_events'):
             self._events = asyncio.Queue()
 
-        if self._impactor is None:
+        if not hasattr(self, '_impactor'):
             self._impactor = asyncio.ensure_future(self._impacting())
 
     async def connected(self) -> None:
         """
         TODO: Add docstring
         """
-        if self.WANTED and self.EFFECTS:
+        await super().connected()
+
+        if hasattr(self, 'WANTED') and hasattr(self, 'EFFECTS'):
             for event_path in self.EFFECTS.keys():
                 await self._subscribe(event_path)
             
-            self.WANTED = {}
+            del self.__class__.WANTED
 
     async def _subscribe(self, event_path: str) -> None:
         """
@@ -104,7 +107,7 @@ class Effector(Connectable):
         else:
             event_props.update({'*event': event_path})
 
-            await self._events.put(event_payload)
+            await self._events.put(event_props)
 
     async def _impacting(self) -> None:
         """
