@@ -12,6 +12,8 @@ class Animal(eventer.Animal, effectors.Family, effectors.Human):
     """
     TODO: Add docstring
     """
+    SOUND: str
+
     _name: str
 
     def __init__(self, name: str) -> None:
@@ -52,6 +54,21 @@ class Animal(eventer.Animal, effectors.Family, effectors.Human):
         """
         core_id = self.__class__.__name__
         print(f'\nThe {core_id} core is stopped')
+
+    async def _come_up(self) -> None:
+        """
+        TODO: Add docstring
+        """
+        # Causes the `came` event
+        await self.came(name=self._name)
+
+    async def _make_sound(self, causer: str) -> None:
+        """
+        TODO: Add docstring
+        """
+        print(f'{self.SOUND} for {causer}')
+        # Causes the `sound_made` event
+        await self.sound_made(name=self._name)
 
 
 class Dog(Animal):

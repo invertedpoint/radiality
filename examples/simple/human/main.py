@@ -27,7 +27,7 @@ class Couple:
 
         return self
 
-    def arise(self):
+    def arise(self) -> None:
         """
         TODO: Add docstring
         """

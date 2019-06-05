@@ -16,16 +16,26 @@ class Family(Effector):
         """
         TODO: Add docstring
         """
-        # Causes the `came` event
-        await self.came(name=self._name)
+        await self._come_up()
 
     @effect
     async def gathered(self) -> None:
         """
         TODO: Add docstring
         """
-        # Causes the `hello_said` event
-        await self.hello_said(name=self._name)
+        await self._say_hello()
+
+    async def _come_up(self) -> None:
+        """
+        TODO: Add docstring
+        """
+        raise NotImplementedError
+
+    async def _say_hello(self) -> None:
+        """
+        TODO: Add docstring
+        """
+        raise NotImplementedError
 
 
 class Animal(Effector):
@@ -38,4 +48,10 @@ class Animal(Effector):
         """
         TODO: Add docstring
         """
-        print(f'{name} made a sound! -- {self._name} said.')
+        self._pay_attention(causer=name)
+
+    def _pay_attention(self, causer: str) -> None:
+        """
+        TODO: Add docstring
+        """
+        raise NotImplementedError

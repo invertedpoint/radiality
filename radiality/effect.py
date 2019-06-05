@@ -14,6 +14,6 @@ def effect(method: Callable[..., None]) -> Callable[..., None]:
     Decorator for the definition of an effect
     """
     if asyncio.iscoroutinefunction(method):
-        setattr(method, 'IS_EFFECT', True)
+        setattr(method, '_IS_EFFECT_', True)
 
     return method

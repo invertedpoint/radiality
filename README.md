@@ -9,7 +9,7 @@ architecture.
 
 ## Requirements
 
-* Python >= 3.5.2
+* Python >= 3.6.7
 
 ## How to use
 

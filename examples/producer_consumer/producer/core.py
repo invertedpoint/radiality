@@ -16,29 +16,46 @@ class Producer(eventer.Producer, effectors.Consumer):
     JOBS_NUMBER = 10
     MAX_SLEEP_TIME = 5  # 5 sec
 
-    _task = None  # type: asyncio.Task
+    _task: asyncio.Task
 
-    def launch(self):
+    def arise(self) -> None:
+        """
+        TODO: Add docstring
+        """
         loop = asyncio.get_event_loop()
 
         try:
+            self._intro()
+
             self._task = asyncio.ensure_future(
                 self._produce(n=self.JOBS_NUMBER)
             )
-
-            print('The `Producer` core running...')
-            channel_uri = self.channel_uri()
-            if channel_uri:
-                print('and it is available at [{0}]...'.format(channel_uri))
-
             loop.run_until_complete(self._task)
         except KeyboardInterrupt:
             pass
         finally:
-            print('\nThe `Producer` core is stopped')
+            self._outro()
+            # Exit
             loop.close()
 
-    async def _produce(self, n):
+    def _intro(self) -> None:
+        """
+        TODO: Add docstring
+        """
+        core_id = self.__class__.__name__
+        print(f'(i) The {core_id} core running...')
+
+    def _outro(self) -> None:
+        """
+        TODO: Add docstring
+        """
+        core_id = self.__class__.__name__
+        print(f'\n(i) The {core_id} core is stopped')
+
+    async def _produce(self, n: int) -> None:
+        """
+        TODO: Add docstring
+        """
         for x in range(1, n + 1):
             data = str(x)
             # Causes the `producing` event
@@ -52,7 +69,10 @@ class Producer(eventer.Producer, effectors.Consumer):
         # Stops all tasks
         self._stop()
 
-    def _stop(self):
+    def _stop(self) -> None:
+        """
+        TODO: Add docstring
+        """
         for task in asyncio.Task.all_tasks():
             if task != self._task:
                 task.cancel()

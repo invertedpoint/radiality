@@ -7,15 +7,27 @@ from radiality import Effector
 
 
 class Consumer(Effector):
+    """
+    TODO: Add docstring
+    """
 
     @effect
-    async def consuming(self, data):
-        print('Consuming {0}...'.format(data))
+    async def consuming(self, data: str) -> None:
+        """
+        TODO: Add docstring
+        """
+        print(f'Consuming {data}...')
 
     @effect
-    async def consumed(self, data):
-        print('Consumed {0}'.format(data))
+    async def consumed(self, data: str) -> None:
+        """
+        TODO: Add docstring
+        """
+        print(f'Consumed {data}')
 
     @effect
-    async def completed(self):
+    async def completed(self) -> None:
+        """
+        TODO: Add docstring
+        """
         print('Completed')

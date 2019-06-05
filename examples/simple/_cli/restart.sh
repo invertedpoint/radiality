@@ -1,10 +1,15 @@
 #!/bin/bash
 
-source $(pwd)/_cli/stop.sh
+if [ "$1" == "--hard" ]; then
+    source $(pwd)/_cli/terminate.sh
+    source $(pwd)/_cli/start.sh
+else
+    echo "Restarting system..."
 
-source $(pwd)/_cli/_clean_bytecode.sh
+    source $(pwd)/_cli/_stop.sh
+    source $(pwd)/_cli/_clean_bytecode.sh
 
-echo "Restarting system..."
-$(pwd)/_venv/bin/supervisorctl -c $(pwd)/_configs/supervisord.conf \
-    start all
-echo "System restarted."
+    source $(pwd)/_cli/_start.sh
+
+    echo "System restarted."
+fi

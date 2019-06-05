@@ -1,6 +1,7 @@
 #!/bin/bash
 
-echo "Stopping subsystem..."
-$(pwd)/venv/bin/supervisorctl -c $(pwd)/configs/supervisord.conf \
-    stop all
-echo "Subsystem stopped."
+echo "Stopping system..."
+
+source $(pwd)/_cli/_stop.sh
+
+echo "System stopped."

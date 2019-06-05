@@ -18,6 +18,12 @@ class Human(Effector):
         """
         self._stop_expecting(name)
 
+    def _stop_expecting(self, name: str) -> None:
+        """
+        TODO: Add docstring
+        """
+        raise NotImplementedError
+
 
 class Animal(Effector):
     """
@@ -30,3 +36,9 @@ class Animal(Effector):
         TODO: Add docstring
         """
         self._stop_expecting(name)
+
+    def _stop_expecting(self, name: str) -> None:
+        """
+        TODO: Add docstring
+        """
+        raise NotImplementedError

@@ -1,4 +1,3 @@
 #!/bin/bash
 
-$(pwd)/venv/bin/supervisorctl \
-    -c $(pwd)/configs/supervisord.conf status
+$(pwd)/_venv/bin/supervisorctl -c $(pwd)/_configs/supervisord.conf status

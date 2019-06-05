@@ -1,5 +1,5 @@
 """
-radiality:examples:producer_consumer:pattern:client
+radiality:examples:producer_consumer:_pattern:client
 """
 
 import asyncio

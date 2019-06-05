@@ -12,6 +12,7 @@ pypy/
 _pypy/
 
 # Source code editors
+.vscode
 .idea
 *~
 
@@ -21,4 +22,3 @@ _pypy/
 
 # PyTest results
 **.cache/
-base/config.py

@@ -22,7 +22,7 @@ def event(method: Callable[..., None]) -> Callable[..., None]:
     defaults = (method.__defaults__ or ())[::-1]
     event_props_tmpl = list(zip_longest(keys, defaults))[::-1]
 
-    if is_empty_func(method):
+    if _is_empty_func(method):
         @wraps(method)
         async def _wrapper(self, *args: Any, **kwargs: Any) -> None:
             """
@@ -34,7 +34,7 @@ def event(method: Callable[..., None]) -> Callable[..., None]:
             }
             event_props.update(kwargs)
 
-            await self._actualize(event_id, event_props)
+            await self._actualize_(event_id, event_props)
     else:
         @wraps(method)
         async def _wrapper(self, *args: Any, **kwargs: Any) -> None:
@@ -48,14 +48,14 @@ def event(method: Callable[..., None]) -> Callable[..., None]:
             event_props.update(kwargs)
 
             await method(self, *args, **kwargs)
-            await self._actualize(event_id, event_props)
+            await self._actualize_(event_id, event_props)
 
-    setattr(_wrapper, 'IS_EVENT', True)
+    setattr(_wrapper, '_IS_EVENT_', True)
 
     return _wrapper
 
 
-def is_empty_func(func: Callable[..., None]) -> bool:
+def _is_empty_func(func: Callable[..., None]) -> bool:
     """
     Checks if a function is empty
     """

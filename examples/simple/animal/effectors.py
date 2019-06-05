@@ -16,8 +16,13 @@ class Family(Effector):
         """
         TODO: Add docstring
         """
-        # Causes the `came` event
-        await self.came(name=self._name)
+        await self._come_up()
+
+    async def _come_up(self) -> None:
+        """
+        TODO: Add docstring
+        """
+        raise NotImplementedError
 
 
 class Human(Effector):
@@ -26,10 +31,14 @@ class Human(Effector):
     """
 
     @effect
-    async def hello_said(self, name) -> None:
+    async def hello_said(self, name: str) -> None:
         """
         TODO: Add docstring
         """
-        print(f'{self.SOUND} for {name}')
-        # Causes the `sound_made` event
-        await self.sound_made(name=self._name)
+        await self._make_sound(causer=name)
+
+    async def _make_sound(self, causer: str) -> None:
+        """
+        TODO: Add docstring
+        """
+        raise NotImplementedError

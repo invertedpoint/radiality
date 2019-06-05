@@ -11,15 +11,27 @@ ENDC = '\x1b[0m'
 
 
 class Producer(Eventer):
+    """
+    TODO: Add docstring
+    """
 
     @event
-    async def producing(self, data, n):
-        print('{0}Producing {1}/{2}{3}'.format(DEFC, data, n, ENDC))
+    async def producing(self, data: str, n: int) -> None:
+        """
+        TODO: Add docstring
+        """
+        print(f'{DEFC}Producing {data}/{n}{ENDC}')
 
     @event
-    async def produced(self, data, n):
-        print('{0}Produced {1}/{2}{3}'.format(DEFC, data, n, ENDC))
+    async def produced(self, data: str, n: int) -> None:
+        """
+        TODO: Add docstring
+        """
+        print(f'{DEFC}Produced {data}/{n}{ENDC}')
 
     @event
-    async def completed(self):
-        print('{0}Completed{1}'.format(DEFC, ENDC))
+    async def completed(self) -> None:
+        """
+        TODO: Add docstring
+        """
+        print(f'{DEFC}Completed{ENDC}')

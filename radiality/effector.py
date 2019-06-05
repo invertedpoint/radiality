@@ -25,19 +25,19 @@ class Effector(Connectable):
     """
     TODO: Add docstring
     """
-    WANTED: Dict[str, Type]
-    EFFECTS: Dict[str, Callable[..., None]]
+    _WANTED_: Dict[str, Type]
+    _EFFECTS_: Dict[str, Callable[..., None]]
 
-    _events: asyncio.Queue
-    _impactor: asyncio.Task
+    _events_: asyncio.Queue
+    _impactor_: asyncio.Task
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Self:
         """
         TODO: Add docstring
         """
-        if not hasattr(cls, 'WANTED'):
+        if not hasattr(cls, '_WANTED_'):
             effector_types = {Effector}
-            cls.WANTED = {
+            cls._WANTED_ = {
                 base_cls.__name__: base_cls
                 for base_cls in cls.__mro__
                 if (base_cls not in effector_types) and (
@@ -45,12 +45,12 @@ class Effector(Connectable):
                 )
             }
 
-        if not hasattr(cls, 'EFFECTS'):
-            cls.EFFECTS = {
+        if not hasattr(cls, '_EFFECTS_'):
+            cls._EFFECTS_ = {
                 ref.__qualname__: ref
-                for effector_cls in cls.WANTED.values()
+                for effector_cls in cls._WANTED_.values()
                 for ref in effector_cls.__dict__.values()
-                if getattr(ref, 'IS_EFFECT', False)
+                if getattr(ref, '_IS_EFFECT_', False)
             }
 
         return super().__new__(cls)
@@ -61,30 +61,30 @@ class Effector(Connectable):
         """
         super().__init__()
 
-        if not hasattr(self, '_events'):
-            self._events = asyncio.Queue()
+        if not hasattr(self, '_events_'):
+            self._events_ = asyncio.Queue()
 
-        if not hasattr(self, '_impactor'):
-            self._impactor = asyncio.ensure_future(self._impacting())
+        if not hasattr(self, '_impactor_'):
+            self._impactor_ = asyncio.ensure_future(self._impacting_())
 
-    async def connected(self) -> None:
+    async def _connected_(self) -> None:
         """
         TODO: Add docstring
         """
-        await super().connected()
+        await super()._connected_()
 
-        if hasattr(self, 'WANTED') and hasattr(self, 'EFFECTS'):
-            for event_path in self.EFFECTS.keys():
-                await self._subscribe(event_path)
+        if hasattr(self, '_WANTED_') and hasattr(self, '_EFFECTS_'):
+            for event_path in self._EFFECTS_.keys():
+                await self._subscribe_(event_path)
             
-            del self.__class__.WANTED
+            del self.__class__._WANTED_
 
-    async def _subscribe(self, event_path: str) -> None:
+    async def _subscribe_(self, event_path: str) -> None:
         """
         TODO: Add docstring
         """
         try:
-            await self.connection().subscribe(event_path, cb=self._add_event)
+            await self._connection_.subscribe(event_path, cb=self._add_event_)
         except errors.ErrConnectionClosed as exc:
             print(f'(i) Connection closed prematurely: {exc}')
         except errors.ErrTimeout as exc:
@@ -92,7 +92,7 @@ class Effector(Connectable):
                 f'(i) Timeout occured when subscribing [{event_path}]: {exc}'
             )
 
-    async def _add_event(self, message) -> None:
+    async def _add_event_(self, message) -> None:
         """
         TODO: Add docstring
         """
@@ -107,15 +107,15 @@ class Effector(Connectable):
         else:
             event_props.update({'*event': event_path})
 
-            await self._events.put(event_props)
+            await self._events_.put(event_props)
 
-    async def _impacting(self) -> None:
+    async def _impacting_(self) -> None:
         """
         TODO: Add docstring
         """
         while True:
-            event_props = await self._events.get()
+            event_props = await self._events_.get()
 
             event_path = event_props.pop('*event', None)
-            if event_path in self.EFFECTS:
-                await self.EFFECTS[event_path](self, **event_props)
+            if event_path in self._EFFECTS_:
+                await self._EFFECTS_[event_path](self, **event_props)

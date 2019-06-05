@@ -12,7 +12,7 @@ VERSION = imp.load_source(
 README = io.open('README.md', 'r', encoding='utf-8').read()
 
 REQUIRES = [
-    'asyncio-nats-client==0.8.2'
+    'asyncio-nats-client==0.9.2'
 ]
 
 setup(

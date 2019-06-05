@@ -1,11 +1,15 @@
 #!/bin/bash
 
-source $(pwd)/scripts/stop.sh
+if [ "$1" == "--hard" ]; then
+    source $(pwd)/_cli/terminate.sh
+    source $(pwd)/_cli/start.sh
+else
+    echo "Restarting system..."
 
-find $(pwd) -name "*.log" -delete
-find $(pwd) -name "*.log.*" -delete
+    source $(pwd)/_cli/_stop.sh
+    source $(pwd)/_cli/_clean_bytecode.sh
 
-echo "Restarting subsystem..."
-$(pwd)/venv/bin/supervisorctl -c $(pwd)/configs/supervisord.conf \
-    start all
-echo "Subsystem restarted."
+    source $(pwd)/_cli/_start.sh
+
+    echo "System restarted."
+fi

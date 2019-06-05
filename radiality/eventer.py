@@ -23,13 +23,13 @@ class Eventer(Connectable):
     """
     TODO: Add docstring
     """
-    CORE_ID: str
+    _CORE_ID_: str
 
     def __new__(cls, *args: Any, **kwargs: Any) -> Self:
         """
         TODO: Add docstring
         """
-        if not hasattr(cls, 'CORE_ID'):
+        if not hasattr(cls, '_CORE_ID_'):
             eventer_cls = Eventer
             core_ids = [
                 base_cls.__name__
@@ -38,20 +38,20 @@ class Eventer(Connectable):
             ]
 
             if len(core_ids) == 1:
-                cls.CORE_ID = core_ids[0]
+                cls._CORE_ID_ = core_ids[0]
             else:
                 # TODO: handle the error
                 pass
 
         return super().__new__(cls)
 
-    async def _actualize(
+    async def _actualize_(
         self, event_id: str, event_props: Dict[str, Any]
     ) -> None:
         """
         TODO: Add docstring
         """
-        event_path = f'{self.CORE_ID}.{event_id}'
+        event_path = f'{self._CORE_ID_}.{event_id}'
 
         try:
             event_payload = json.dumps(event_props)
@@ -59,14 +59,16 @@ class Eventer(Connectable):
             # TODO: handle the error
             pass
         else:
-            await self._publish(event_path, event_payload)
+            await self._publish_(event_path, event_payload)
 
-    async def _publish(self, event_path: str, event_payload: str) -> None:
+    async def _publish_(self, event_path: str, event_payload: str) -> None:
         """
         TODO: Add docstring
         """
         try:
-            await self.connection().publish(event_path, event_payload.encode())
+            await self._connection_().publish(
+                event_path, event_payload.encode()
+            )
         except errors.ErrConnectionClosed as exc:
             print(f'(i) Connection closed prematurely: {exc}')
         except errors.ErrTimeout as exc:
