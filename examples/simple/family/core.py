@@ -51,14 +51,17 @@ class Family(eventer.Family, effectors.Human, effectors.Animal):
         """
         TODO: Add docstring
         """
-        while len(self._expected_members) > 0:
-            print('(i) Gathering...')
-            # Causes the `gathering` event
-            await self.gathering()
-            # Waits a little before the re-causing of the `gathering` event
-            await asyncio.sleep(1)
-        # Causes the `gathered` event
-        await self.gathered()
+        try:
+            while len(self._expected_members) > 0:
+                print('(i) Gathering...')
+                # Causes the `gathering` event
+                await self.gathering()
+                # Waits a little before the re-causing of the `gathering` event
+                await asyncio.sleep(1)
+            # Causes the `gathered` event
+            await self.gathered()
+        except Exception as exc:
+            print(str(exc))
 
     def _stop_expecting(self, name: str) -> None:
         """

@@ -66,7 +66,7 @@ class Eventer(Connectable):
         TODO: Add docstring
         """
         try:
-            await self._connection_().publish(
+            await self._connection_.publish(
                 event_path, event_payload.encode()
             )
         except errors.ErrConnectionClosed as exc:
