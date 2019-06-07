@@ -66,13 +66,3 @@ class Producer(eventer.Producer, effectors.Consumer):
             await self.produced(data, n)
         # Causes the `completed` event
         await self.completed()
-        # Stops all tasks
-        self._stop()
-
-    def _stop(self) -> None:
-        """
-        TODO: Add docstring
-        """
-        for task in asyncio.Task.all_tasks():
-            if task != self._task:
-                task.cancel()

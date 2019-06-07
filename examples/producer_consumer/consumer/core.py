@@ -69,16 +69,6 @@ class Consumer(eventer.Consumer, effectors.Producer):
             await self.consumed(data)
         # Causes the `completed` event
         await self.completed()
-        # Stops all tasks
-        self._stop()
-
-    def _stop(self) -> None:
-        """
-        TODO: Add docstring
-        """
-        for task in asyncio.Task.all_tasks():
-            if task != self._task:
-                task.cancel()
 
     async def _add_job(self, data: Optional[str]) -> None:
         """

@@ -2,6 +2,7 @@
 
 if [ "$1" == "--hard" ]; then
     source $(pwd)/_cli/terminate.sh
+    sleep 1
     source $(pwd)/_cli/start.sh
 else
     echo "Restarting system..."

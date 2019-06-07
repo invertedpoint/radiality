@@ -6,10 +6,6 @@ from radiality import event
 from radiality import Eventer
 
 
-DEFC = '\x1b[0;30;47m'
-ENDC = '\x1b[0m'
-
-
 class Consumer(Eventer):
     """
     TODO: Add docstring
@@ -20,14 +16,14 @@ class Consumer(Eventer):
         """
         TODO: Add docstring
         """
-        print(f'{DEFC}Consuming {data}...{ENDC}')
+        print(f'⚡ Consuming {data}...')
 
     @event
     async def consumed(self, data: str) -> None:
         """
         TODO: Add docstring
         """
-        print(f'{DEFC}Consumed {data}{ENDC}')
+        print(f'⚡ Consumed {data}')
         # Notifies the queue that data has been processed
         self._finalize_jobs()
 
@@ -36,7 +32,7 @@ class Consumer(Eventer):
         """
         TODO: Add docstring
         """
-        print(f'{DEFC}Completed{ENDC}')
+        print('⚡ Completed')
 
     def _finalize_jobs(self) -> None:
         """

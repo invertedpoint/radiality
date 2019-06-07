@@ -6,10 +6,6 @@ from radiality import event
 from radiality import Eventer
 
 
-DEFC = '\x1b[0;32;40m'
-ENDC = '\x1b[0m'
-
-
 class Producer(Eventer):
     """
     TODO: Add docstring
@@ -20,18 +16,18 @@ class Producer(Eventer):
         """
         TODO: Add docstring
         """
-        print(f'{DEFC}Producing {data}/{n}{ENDC}')
+        print(f'⚡ Producing {data}/{n}')
 
     @event
     async def produced(self, data: str, n: int) -> None:
         """
         TODO: Add docstring
         """
-        print(f'{DEFC}Produced {data}/{n}{ENDC}')
+        print(f'⚡ Produced {data}/{n}')
 
     @event
     async def completed(self) -> None:
         """
         TODO: Add docstring
         """
-        print(f'{DEFC}Completed{ENDC}')
+        print('⚡ Completed')

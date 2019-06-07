@@ -18,14 +18,14 @@ class Producer(Effector):
         """
         TODO: Add docstring
         """
-        print('Producing {0}/{1}...'.format(data, n))
+        print(f'⟳ Producing {data}/{n}...')
 
     @effect
     async def produced(self, data: str, n: int) -> None:
         """
         TODO: Add docstring
         """
-        print('Produced {0}/{1}'.format(data, n))
+        print(f'⟳ Produced {data}/{n}')
         await self._add_job(data)
 
     @effect
@@ -33,7 +33,7 @@ class Producer(Effector):
         """
         TODO: Add docstring
         """
-        print('Completed')
+        print('⟳ Completed')
         await self._add_job(data=None)
 
     async def _add_job(self, data: Optional[str]) -> None:
