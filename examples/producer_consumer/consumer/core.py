@@ -2,6 +2,7 @@
 radiality:examples:producer_consumer:consumer:core
 """
 
+from typing import Optional
 import asyncio
 from random import random
 
@@ -15,29 +16,47 @@ class Consumer(eventer.Consumer, effectors.Producer):
     """
     MAX_SLEEP_TIME = 5  # 5 sec
 
-    _jobs = None  # type: asyncio.Queue
-    _task = None  # type: asyncio.Task
+    _jobs: asyncio.Queue
+    _task: asyncio.Task
 
-    def launch(self):
+    def arise(self) -> None:
+        """
+        TODO: Add docstring
+        """
         loop = asyncio.get_event_loop()
 
         try:
+            self._intro()
+
             self._jobs = asyncio.Queue()
             self._task = asyncio.ensure_future(self._consume())
-
-            print('The `Consumer` core running...')
-            channel_uri = self.channel_uri()
-            if channel_uri:
-                print('and it is available at [{0}]...'.format(channel_uri))
 
             loop.run_until_complete(self._task)
         except KeyboardInterrupt:
             pass
         finally:
-            print('\nThe `Consumer` core is stopped')
+            self._outro()
+            # Exit
             loop.close()
 
-    async def _consume(self):
+    def _intro(self) -> None:
+        """
+        TODO: Add docstring
+        """
+        core_id = self.__class__.__name__
+        print(f'(i) The {core_id} core running...')
+
+    def _outro(self) -> None:
+        """
+        TODO: Add docstring
+        """
+        core_id = self.__class__.__name__
+        print(f'\n(i) The {core_id} core is stopped')
+
+    async def _consume(self) -> None:
+        """
+        TODO: Add docstring
+        """
         while True:
             data = await self._jobs.get()
             if data is None:  # => producing is completed
@@ -50,10 +69,15 @@ class Consumer(eventer.Consumer, effectors.Producer):
             await self.consumed(data)
         # Causes the `completed` event
         await self.completed()
-        # Stops all tasks
-        self._stop()
 
-    def _stop(self):
-        for task in asyncio.Task.all_tasks():
-            if task != self._task:
-                task.cancel()
+    async def _add_job(self, data: Optional[str]) -> None:
+        """
+        TODO: Add docstring
+        """
+        await self._jobs.put(data)
+
+    def _finalize_jobs(self) -> None:
+        """
+        Notifies the queue that data has been processed
+        """
+        self._jobs.task_done()

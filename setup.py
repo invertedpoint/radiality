@@ -1,7 +1,8 @@
 import os
 import io
 import imp
-from setuptools import find_packages, setup
+from setuptools import find_packages
+from setuptools import setup
 
 
 VERSION = imp.load_source(
@@ -11,7 +12,7 @@ VERSION = imp.load_source(
 README = io.open('README.md', 'r', encoding='utf-8').read()
 
 REQUIRES = [
-    'websockets==6.0'
+    'asyncio-nats-client==0.9.2'
 ]
 
 setup(
@@ -34,11 +35,10 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7'
     ],
-    keywords='web framework api websocket microservice reactive architecture',
+    keywords='web framework api microservice reactive architecture',
     author='Max Sukhorukov',
     author_email='signaldetect@gmail.com',
     url='https://github.com/invertedpoint/radiality',
