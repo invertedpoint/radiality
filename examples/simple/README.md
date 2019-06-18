@@ -5,6 +5,8 @@ A simple application with several subsystems communicating through events and ef
 ## Installing and running
 
 ```sh
+docker pull nats
+docker run -d --name ms -p 4222:4222 -p 6222:6222 -p 8222:8222 nats
 git clone https://github.com/invertedpoint/radiality.git
 cd radiality/examples/simple/
 . _cli/setup.sh
